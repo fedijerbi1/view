@@ -31,7 +31,8 @@ export default function Login() {
                     <div className='card'> 
                         <div className='card-body'>
                          
-                <h1 className='card-title'>Login</h1> 
+                <h1 className='card-title'>Se connecter</h1> 
+                <h4 className='card-subtitle mb-4 text-muted'>Patient/Médecin</h4> 
                 <div className="mb-3">
                                         <label className="form-label">Type d'utilisateur</label>
                                         <select 
@@ -50,11 +51,12 @@ export default function Login() {
                             <input type="text" id="cin" name="cin" className='form-control' value={form.cin} onChange={handleChange} />
                         </div>
                         <div className='mb-3'>
-                            <label htmlFor="password" className='form-label'>Password:</label>
+                            <label htmlFor="password" className='form-label'>Mot de passe:</label>
                             <input type="password" id="password" name="password" className='form-control' value={form.password} onChange={handleChange} />
                 </div> 
-                <button type="submit" className='btn btn-primary'>Login</button> 
-                <Link to="/forgot-password" className='btn btn-link'>Forgot Password?</Link> 
+                <button type="submit" className='btn btn-primary'>Se connecter
+</button> 
+                <Link to="/forgot-password" className='btn btn-link'>Mot de passe oublié ?</Link> 
                 <Link to="/register" className='btn btn-link'>Register</Link> 
             </form>
         </div>
