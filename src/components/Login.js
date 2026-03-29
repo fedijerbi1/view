@@ -6,7 +6,7 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 export default function Login() { 
     
-    const [form, setForm] = useState({cin: '', password: ''});
+    const [form, setForm] = useState({cin: '', password: '', role: 'medecin'});
     function handleChange(event) {
         const { name, value } = event.target;
         setForm(prevForm => ({ ...prevForm, [name]: value }));
@@ -17,7 +17,7 @@ export default function Login() {
             Swal.fire('Error', 'Please fill in both CIN and password fields.', 'error');
             return;
         }
-        setForm({cin: '', password: ''});
+        setForm({cin: '', password: '',role: 'medecin'});
     };
 
     return (
@@ -30,8 +30,20 @@ export default function Login() {
                 <div className='col-md-6'>
                     <div className='card'> 
                         <div className='card-body'>
-                        
-                <h1>Login</h1>
+                         
+                <h1 className='card-title'>Login</h1> 
+                <div className="mb-3">
+                                        <label className="form-label">Type d'utilisateur</label>
+                                        <select 
+                                        htmlFor="role" name="role" id="role"
+                                            className="form-select"
+                                            value={form.role}
+                                            onChange={handleChange}
+                                        >
+                                            <option  value="medecin">Médecin</option>
+                                            <option value="patient">Patient</option>
+                                        </select>
+                                    </div>
                     <form onSubmit={handleSubmit}>
                         <div className='mb-3'>
                             <label htmlFor="cin" className='form-label'>CIN:</label>
