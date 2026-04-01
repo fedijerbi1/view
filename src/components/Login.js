@@ -11,7 +11,7 @@ const token = localStorage.getItem('token');
 export default function Login() { 
     const navigate = useNavigate();
 
-    const [form, setForm] = useState({cin: '', password: '', role: 'medecin'});
+    const [form, setForm] = useState({email: '', password: '', role: 'medecin'});
     function handleChange(event) {
         const { name, value } = event.target;
         setForm(prevForm => ({ ...prevForm, [name]: value }));
@@ -29,12 +29,12 @@ export default function Login() {
                 console.error(error);
                 Swal.fire('Error', error.response?.data?.message || 'An error occurred', 'error');
             });
-        if ( form.cin.trim() === '' || form.password.trim() === '') {
-            Swal.fire('Error', 'Please fill in both CIN and password fields.', 'error');
+        if ( form.email.trim() === '' || form.password.trim() === '') {
+            Swal.fire('Error', 'Please fill in both email and password fields.', 'error');
             return;
         } 
         
-        setForm({cin: '', password: '',});
+        setForm({email: '', password: '',});
     };
 
     return (
@@ -53,8 +53,8 @@ export default function Login() {
 
                     <form onSubmit={handleSubmit}>
                         <div className='mb-3'>
-                            <label htmlFor="cin" className='form-label'>CIN:</label>
-                            <input type="text" id="cin" name="cin" className='form-control' value={form.cin} onChange={handleChange} />
+                            <label htmlFor="email" className='form-label'>email:</label>
+                            <input type="text" id="email" name="email" className='form-control' value={form.email} onChange={handleChange} />
                         </div>
                         <div className='mb-3'>
                             <label htmlFor="password" className='form-label'>Mot de passe:</label>
