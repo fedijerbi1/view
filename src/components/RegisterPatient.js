@@ -145,7 +145,7 @@ function RegisterPatient() {
                     >
                       <i className="bi bi-check-lg me-2"></i>Register Patient
                     </button>
-                    <Link to="/" className="text-decoration-none small text-primary">
+                    <Link to="espace-admin" className="text-decoration-none small text-primary">
                       <i className="bi bi-arrow-left me-1"></i>Retour à l’accueil
                     </Link>
                   </div>

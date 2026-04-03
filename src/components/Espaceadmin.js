@@ -37,12 +37,12 @@ const response =await axios.get ("http://localhost:5000/api/users",{
         });  
         console.log (response.data) ;
         Setusers(response.data)
-        Swal.fire ("success" , 'donnne recuperer avec succes ' ,response.data) ;
+        Swal.fire ("success" , 'données récupérées avec succès ' ,response.data) ;
 
 
 } 
 catch (error) { 
-Swal.fire ("error" , 'erreur se produit lors de la recuperation de donnne ' ,error) ; 
+Swal.fire ("error" , 'erreur se produit lors de la récupération des données ' ,error) ; 
 }
 }
 fetchUsers() ; 
