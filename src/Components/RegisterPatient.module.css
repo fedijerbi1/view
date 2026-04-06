@@ -1,0 +1,39 @@
+.customCard {
+  box-shadow: 0 0.5rem 1rem hsla(9, 8%, 31%, 0.15) !important;
+  border:none !important;
+  border-radius: 1rem !important;
+}
+
+.customHeader {
+  background-color: white !important;
+  border-bottom: none !important;
+  padding-top: 1.5rem !important;
+  padding-bottom: 0 !important;
+}
+
+.customBody {
+  padding: 1.5rem !important;
+}
+
+.customFooter {
+  background-color: white !important;
+  border-top: none !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.title {
+  color: #17181a;
+  font-weight: bold;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+.optional {
+  color: #840b56;
+  font-size: 0.875rem;
+  margin-left: 0.25rem;
+}
