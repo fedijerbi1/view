@@ -18,6 +18,8 @@ export default function Login() {
     }
     const handleSubmit = (event) => {
         event.preventDefault();  
+        form.email = form.email.trim();
+        form.password = form.password.trim();
         axios.post('http://localhost:5000/api/login', form)
             .then(response => {
                 console.log(response.data);
