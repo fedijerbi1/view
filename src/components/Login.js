@@ -11,7 +11,7 @@ const token = localStorage.getItem('token');
 export default function Login() { 
     const navigate = useNavigate();
 
-    const [form, setForm] = useState({email: '', password: '', role: 'medecin'});
+    const [form, setForm] = useState({email: '', password: ''});
     function handleChange(event) {
         const { name, value } = event.target;
         setForm(prevForm => ({ ...prevForm, [name]: value }));

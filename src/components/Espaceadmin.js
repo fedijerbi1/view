@@ -14,7 +14,8 @@ import DataTable from 'react-data-table-component';
   { name: "CIN", selector: row => row.cin, sortable: true },
   {name:"Date de creation ", selector: row => row.created_at, sortable: true },
   {name:"plan", selector: row => row.plan, sortable: true },
-  { name: "Date de creation ", selector: row => row.created_at, sortable: true }
+  { name: "Date de creation ", selector: row => row.created_at, sortable: true }, 
+  {name:"last login ", selector: row => row.lastlog, sortable: true },
 ]; 
 
 
