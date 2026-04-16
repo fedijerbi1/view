@@ -114,7 +114,7 @@ function CreateMedecin() {
           <div className='col-md-8'>
             <div className='card'>
               <div className='card-body'>
-                <h1 className='card-title'>Créer un compte médecin</h1>
+                <h2 className='card-title'>Créer un compte médecin</h2> 
 
                 <form onSubmit={handleSubmit}>
                   <div className='mb-3'>
@@ -177,7 +177,7 @@ function CreateMedecin() {
                   </div>
 
                   <button type='submit' className='btn btn-primary'>Créer le compte médecin</button>
-                  <Link to='' className='btn btn-link ms-2'>Retour à l'accueil</Link>
+                  <Link to='/espace-admin' className='btn btn-link ms-2'>Retour à l'accueil</Link>
                 </form>
               </div>
             </div>

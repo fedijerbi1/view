@@ -11,7 +11,7 @@ const token = localStorage.getItem('token');
 export default function Login() { 
     const navigate = useNavigate();
 
-    const [form, setForm] = useState({email: '', password: '', role: 'medecin'});
+    const [form, setForm] = useState({email: '', password: ''});
     function handleChange(event) {
         const { name, value } = event.target;
         setForm(prevForm => ({ ...prevForm, [name]: value }));
@@ -23,7 +23,13 @@ export default function Login() {
                 console.log(response.data);
                 Swal.fire('Success', 'Login successful!', 'success'); 
                 localStorage.setItem('token', response.data.token);
-                navigate(response.data.role ==='medecin' ? '/medecin-dashboard' : '/patient-dashboard');
+                if (response.data.role === 'admin') {
+                    navigate('/espace-admin');
+                } else if (response.data.role === 'medecin') {
+                    navigate('/espacemedecin');
+                } else if (response.data.role === 'patient') {
+                    navigate('/espacepatient');
+                }
             })
             .catch(error => {
                 console.error(error);
@@ -63,7 +69,7 @@ export default function Login() {
                 <button type="submit" className='btn btn-primary'>Se connecter
 </button> 
                 <Link to="/forgot-password" className='btn btn-link'>Mot de passe oublié ?</Link> 
-                <Link to="/register" className='btn btn-link'>Register</Link> 
+                <Link to="/register-patient" className='btn btn-link'>Register</Link> 
             </form>
         </div>
     </div>
