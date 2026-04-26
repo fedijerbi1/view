@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const specialites = [
   'Médecine générale',
@@ -36,47 +37,71 @@ function CreateMedecin() {
     setForm(prevForm => ({ ...prevForm, [name]: value }));
   }
 
+  
+
   const handleSubmit = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    // Enhanced validation
-    if (!form.cin.trim() || !/^\d{8,}$/.test(form.cin)) {
-      Swal.fire('Erreur', 'CIN invalide (8 chiffres ou plus).', 'error');
-      return;
-    }
-    if (!form.nom.trim() || !form.prenom.trim() || !form.email.trim() || !form.dateNaissance) {
-      Swal.fire('Erreur', 'Veuillez remplir tous les champs requis.', 'error');
-      return;
-    }
-    if (!form.email.includes('@') || !form.email.includes('.')) {
-      Swal.fire('Erreur', 'Adresse email invalide.', 'error');
-      return;
-    }
-    if (!/^\+?[1-9]\d{1,14}$/.test(form.telephone.replace(/\\s/g, ''))) {
-      Swal.fire('Erreur', 'Numéro de téléphone invalide.', 'error');
-      return;
-    }
+  // validations
+  if (!form.cin.trim() || !/^\d{8,}$/.test(form.cin)) {
+    Swal.fire('Erreur', 'CIN invalide (8 chiffres ou plus).', 'error');
+    return;
+  }
 
-    try {
-      // Mock API submission (replace with real endpoint if available)
-      console.log('Submitting doctor data:', form);
-      // Example: await axios.post('/api/medecins', form);
+  if (!form.nom.trim() || !form.prenom.trim() || !form.email.trim() || !form.dateNaissance) {
+    Swal.fire('Erreur', 'Veuillez remplir tous les champs requis.', 'error');
+    return;
+  }
 
-      Swal.fire('Succès', 'Compte médecin créé avec succès !', 'success');
-      setForm({
-        cin: '',
-        nom: '',
-        prenom: '',
-        email: '',
-        dateNaissance: '',
-        specialite: 'Médecine générale',
-        telephone: '',
-        adresseCabinet: '',
-      });
-    } catch (error) {
-      Swal.fire('Erreur', 'Erreur lors de la création du compte.', 'error');
-    }
-  };
+  if (!form.email.includes('@') || !form.email.includes('.')) {
+    Swal.fire('Erreur', 'Adresse email invalide.', 'error');
+    return;
+  }
+
+  try {
+    console.log("📤 ENVOI...");
+
+    const response = await axios.post(
+      'http://localhost:5000/api/create-medecin', 
+      {
+        nom: form.nom,
+        prenom: form.prenom,
+        email: form.email,
+        specialite: form.specialite,
+        telephone: form.telephone,
+        cabinet: form.adresseCabinet
+      }
+    );
+
+    console.log("✅ RESPONSE:", response.data);
+
+    Swal.fire('Succès', response.data.message, 'success');
+
+    setForm({
+      
+      nom: '',
+      prenom: '',
+      email: '',
+      dateNaissance: '',
+      specialite: 'Médecine générale',
+      telephone: '',
+      adresseCabinet: '',
+    });
+
+  } catch (error) {
+    console.error("❌ ERROR:", error);
+
+    Swal.fire(
+      'Erreur',
+      error.response?.data?.message || 'Erreur serveur',
+      'error'
+    );
+  }
+};
+
+
+
+
 
   return (
     <div>
@@ -92,18 +117,7 @@ function CreateMedecin() {
                 <h2 className='card-title'>Créer un compte médecin</h2> 
 
                 <form onSubmit={handleSubmit}>
-                  <div className='mb-3'>
-                    <label htmlFor='cin' className='form-label'>CIN</label>
-                    <input 
-                      type='text' 
-                      id='cin' 
-                      name='cin' 
-                      className='form-control' 
-                      value={form.cin} 
-                      onChange={handleChange}
-                      placeholder='12345678'
-                    />
-                  </div>
+                  
 
                   <div className='row'>
                     <div className='col-md-6 mb-3'>
@@ -142,7 +156,7 @@ function CreateMedecin() {
                       className='form-control' 
                       value={form.telephone} 
                       onChange={handleChange}
-                      placeholder='+33612345678'
+                      placeholder='+21612345678'
                     />
                   </div>
 
@@ -164,4 +178,3 @@ function CreateMedecin() {
 }
 
 export default CreateMedecin;
-

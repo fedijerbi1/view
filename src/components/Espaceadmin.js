@@ -7,13 +7,10 @@ import axios from 'axios';
 import DataTable from 'react-data-table-component';
  const columns = [ 
 { name:"id" , selector: row => row.id, sortable: true },
-  { name: "Nom", selector: row => row.name, sortable: true },
+  { name: "Nom", selector: row => row.nom, sortable: true },
   { name: "Email", selector: row => row.email, sortable: true },
-  
-  { name: "role", selector: row => row.role, sortable: true }, 
-  { name: "CIN", selector: row => row.cin, sortable: true },
-  {name:"Date de creation ", selector: row => row.created_at, sortable: true },
-  {name:"plan", selector: row => row.plan, sortable: true },
+ { name: "role", selector: row => row.role, sortable: true }, 
+  { name: "Téléphone", selector: row => row.telephone, sortable: true },
   { name: "Date de creation ", selector: row => row.created_at, sortable: true }, 
   {name:"last login ", selector: row => row.lastlog, sortable: true },
 ]; 
@@ -31,6 +28,10 @@ useEffect (()=>{
 const fetchUsers = async ()=> { 
     try { 
         const token = localStorage.getItem ('token');  
+        if (!token) {
+            navigate('/');
+            return;
+        }
 const response =await axios.get ("http://localhost:5000/api/users",{
           headers: {
             Authorization: `Bearer ${token}`,

@@ -26,7 +26,7 @@ export default function Login() {
                 if (response.data.role === 'admin') {
                     navigate('/espace-admin');
                 } else if (response.data.role === 'medecin') {
-                    navigate('/espacemedecin');
+                    navigate('/espace-medecin');
                 } else if (response.data.role === 'patient') {
                     navigate('/espacepatient');
                 }
