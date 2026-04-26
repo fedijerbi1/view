@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
 
 const specialites = [
   'Médecine générale',
@@ -21,6 +22,7 @@ const specialites = [
 ];
 
 function CreateMedecin() {
+  const Navigate = useNavigate(); 
   const [form, setForm] = useState({
     cin: '',
     nom: '',
@@ -76,6 +78,9 @@ function CreateMedecin() {
     console.log("✅ RESPONSE:", response.data);
 
     Swal.fire('Succès', response.data.message, 'success');
+    if (response.data.status === 201) {
+      Navigate('/espace-admin');
+    }
 
     setForm({
       

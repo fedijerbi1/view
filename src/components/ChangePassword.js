@@ -60,7 +60,7 @@ export default function ChangePassword() {
         return newErrors;
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const validationErrors = validate();
@@ -72,7 +72,7 @@ export default function ChangePassword() {
         setLoading(true);
         const token = localStorage.getItem('token');
 
-        axios.post('http://localhost:5000/api/change-password', {
+       await axios.post('http://localhost:5000/api/change-password', {
             currentPassword: form.currentPassword,
             newPassword: form.newPassword
         }, {

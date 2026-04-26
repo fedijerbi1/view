@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2'; 
+import {useNavigate} from 'react-router-dom';
 
 import { Link } from 'react-router-dom';
-function RegisterPatient() {
+function RegisterPatient() { 
+  const navigate = useNavigate(); 
   const [form, setForm] = useState({
-    cin: "",
+    
     nom: "",
     prenom: "",
     email: "",
     password: "",
     date_naissance: "",
-    maladie_chronique: ""
   });
 
   const handleChange = (e) => {
@@ -24,11 +26,12 @@ function RegisterPatient() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/register-patient", form);
-      alert(res.data.message);
+      const res = await axios.post("http://localhost:5000/api/register-patient", form);
+      Swal.fire('Success', res.data.message, 'success');
+      navigate('/');
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Error");
+      Swal.fire('Error', err.response?.data?.error || "Error", 'error');
     }
   };
 
@@ -48,18 +51,6 @@ function RegisterPatient() {
             <div className="card-body" >
               <form onSubmit={handleSubmit}>
                 <div className="row g-3">
-                  <div className="col-12">
-                    <label htmlFor="cin" className="form-label fw-semibold">CIN</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="cin"
-                      name="cin"
-                      placeholder="CIN"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
 
                   <div className="col-md-6">
                     <label htmlFor="nom" className="form-label fw-semibold">Nom</label>
@@ -125,16 +116,7 @@ function RegisterPatient() {
                     />
                   </div>
 
-                  <div className="col-md-6">
-                    <label htmlFor="maladie_chronique" className="form-label fw-semibold">Maladie chronique<span className="text-muted">(optional)</span></label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="maladie_chronique"
-                      name="maladie_chronique"
-                      onChange={handleChange}
-                    />
-                  </div>
+
 
                  <div className="col-12 mt-4 d-flex align-items-center justify-content-center gap-4 flex-wrap">
                     <button
@@ -145,7 +127,7 @@ function RegisterPatient() {
                     >
                       <i className="bi bi-check-lg me-2"></i>Register Patient
                     </button>
-                    <Link to="espace-admin" className="text-decoration-none small text-primary">
+                    <Link to="/" className="text-decoration-none small text-primary">
                       <i className="bi bi-arrow-left me-1"></i>Retour à l’accueil
                     </Link>
                   </div>
