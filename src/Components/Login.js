@@ -71,7 +71,7 @@ export default function Login() {
                 <button type="submit" className='btn btn-primary'>Se connecter
 </button> 
                 <Link to="/forgot-password" className='btn btn-link'>Mot de passe oublié ?</Link> 
-                <Link to="/register-patient" className='btn btn-link'>Register</Link> 
+                <Link to="/register" className='btn btn-link'>Register</Link> 
             </form>
         </div>
     </div>
