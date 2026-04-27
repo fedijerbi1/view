@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import styles from './RegisterPatient.module.css';
+
 import { Link } from 'react-router-dom';
 function RegisterPatient() {
   const [form, setForm] = useState({
@@ -24,7 +24,7 @@ function RegisterPatient() {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/patients/register",form);
+      const res = await axios.post("http://localhost:5000/register-patient", form);
       alert(res.data.message);
     } catch (err) {
       console.error(err);
@@ -36,16 +36,16 @@ function RegisterPatient() {
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-md-10 col-lg-8">
-          <div className={`card ${styles.customCard}`}>
-            <div className={`card-header ${styles.customHeader}`}>
-              <h2 className={styles.title}>
+          <div className="card">
+            <div className="card-header">
+              <h2 className="card-title mb-0">
                 <i className="bi bi-hospital me-2"></i>Sign up
               </h2>
-              <p className={styles.subtitle}>
+              <h4 className="card-subtitle mb-4 text-muted">
                 Please fill in all required fields
-              </p>
+              </h4>
             </div>
-            <div className={`card-body ${styles.customBody}`}>
+            <div className="card-body" >
               <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                   <div className="col-12">
@@ -126,7 +126,7 @@ function RegisterPatient() {
                   </div>
 
                   <div className="col-md-6">
-                    <label htmlFor="maladie_chronique" className="form-label fw-semibold">Maladie chronique<span className={styles.optional}>(optional)</span></label>
+                    <label htmlFor="maladie_chronique" className="form-label fw-semibold">Maladie chronique<span className="text-muted">(optional)</span></label>
                     <input
                       type="text"
                       className="form-control"
@@ -140,22 +140,19 @@ function RegisterPatient() {
                     <button
                       type="submit"
                       className="btn btn-primary fw-semibold"
-                      style={{
-                        padding: "0.6rem 2rem",
-                        fontSize: "1.25rem",
-                        borderRadius: "0.5rem"
-                      }}
+                          
+                      
                     >
                       <i className="bi bi-check-lg me-2"></i>Register Patient
                     </button>
-                    <Link to="/" className="text-decoration-none small text-primary">
+                    <Link to="espace-admin" className="text-decoration-none small text-primary">
                       <i className="bi bi-arrow-left me-1"></i>Retour à l’accueil
                     </Link>
                   </div>
                 </div>
               </form>
             </div>
-            <div className={`card-footer ${styles.customFooter}`}>
+            <div className='footers'>
               <small className="text-muted">Secure & confidential</small>
             </div>
           </div>
