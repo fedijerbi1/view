@@ -44,8 +44,8 @@ export default function Login() {
     };
 
     return (
-        <div> 
-            <header className=' p-2'>
+        <div className='container'> 
+            <header className='card-header  p-2'style={{textAlign: 'center'}}>
                 <img src={logo} alt="logo" width="50" height="50" />
             </header>
         <div className='container mt-5 '>
