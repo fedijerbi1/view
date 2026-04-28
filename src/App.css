@@ -36,3 +36,59 @@
     transform: rotate(360deg);
   }
 }
+
+.auth-shell {
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #f7f2ff 0%, #f0f7ff 35%, #fef6ec 100%);
+  display: flex;
+  align-items: center;
+}
+
+.auth-card {
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.auth-side {
+  background: linear-gradient(145deg, #1f6feb 0%, #22c1c3 55%, #fdbb2d 100%);
+  position: relative;
+}
+
+.auth-side::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.25), transparent 60%);
+}
+
+.auth-side > div {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-kicker {
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  margin-bottom: 0.75rem;
+}
+
+.auth-title {
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.auth-lead {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.auth-steps {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}

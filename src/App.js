@@ -8,7 +8,8 @@ import ChangePassword from './components/ChangePassword';
 import EspacePatient from './components/EspacePatient';
 import EspaceMedecin from './components/EspaceMedecin';
 import SideBar from './components/SideBar';
-
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 function RequireAuth() {
   const token = localStorage.getItem('token');
   return token ? <Outlet /> : <Navigate to="/" replace />;
@@ -88,6 +89,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register-patient" element={<RegisterPatient />} />
         <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
 
         <Route element={<RequireAuth />}>
