@@ -7,9 +7,9 @@ import RegisterPatient from './components/RegisterPatient';
 import ChangePassword from './components/ChangePassword';
 import EspacePatient from './components/EspacePatient';
 import EspaceMedecin from './components/EspaceMedecin';
-import SideBar from './components/SideBar';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import PortalLayout from './components/PortalLayout';
 function RequireAuth() {
   const token = localStorage.getItem('token');
   return token ? <Outlet /> : <Navigate to="/" replace />;
@@ -17,68 +17,32 @@ function RequireAuth() {
 
 function AdminLayout() {
   const menuItems = [
-    { to: '/espace-admin/tableau-de-bord', label: 'Tableau de bord' },
-    { to: '/espace-admin/gestion-utilisateurs', label: 'Gestion utilisateurs' },
-    { to: '/espace-admin/statistiques-generales', label: 'Statistiques generales' },
+    { to: '/espace-admin/tableau-de-bord', label: 'Tableau de bord', icon: '📊' },
+    { to: '/espace-admin/gestion-utilisateurs', label: 'Gestion utilisateurs', icon: '👥' },
+    { to: '/espace-admin/statistiques-generales', label: 'Statistiques generales', icon: '📈' },
   ];
 
   return (
-    <div className="container-fluid p-0">
-      <div className="row g-0 min-vh-100 align-items-stretch">
-        <div className="col-12 col-md-3 col-lg-2 p-0">
-          <SideBar title="Espace Admin" items={menuItems} bg="bg-primary" />
-        </div>
-        <main className="col-12 col-md-9 col-lg-10 py-4 px-3 px-md-4 min-vh-100">
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function PatientLayout() {
-  const menuItems = [
-    { to: '/espacepatient/tableau-de-bord', label: 'Tableau de bord' },
-    { to: '/espacepatient/saisie-donnees', label: 'Saisie des données' },
-    { to: '/espacepatient/objectifs', label: 'Objectifs' },
-    { to: '/espacepatient/notifications', label: 'Notifications' },
-  ];
-
-  return (
-    <div className="container-fluid p-0">
-      <div className="row g-0 min-vh-100 align-items-stretch">
-        <div className="col-12 col-md-3 col-lg-2 p-0">
-          <SideBar title="Espace Patient" items={menuItems} bg="bg-success" />
-        </div>
-        <main className="col-12 col-md-9 col-lg-10 py-4 px-3 px-md-4 min-vh-100 bg-light">
-          <Outlet />
-        </main>
-      </div>
-    </div>
+    <PortalLayout title="Espace Admin" subtitle="Pilotage et supervision" items={menuItems} accent="primary">
+      <Outlet />
+    </PortalLayout>
   );
 }
 
 function MedecinLayout() {
   const menuItems = [
-    { to: '/espace-medecin/tableau-de-bord', label: 'Tableau de bord' },
-    { to: '/espace-medecin/patients', label: 'Patients' },
-    { to: '/espace-medecin/dossier', label: 'Dossier patient' },
-    { to: '/espace-medecin/prescriptions', label: 'Prescriptions' },
-    { to: '/espace-medecin/communication', label: 'Communication' },
-    { to: '/espace-medecin/rapports', label: 'Rapports' },
+    { to: '/espace-medecin/tableau-de-bord', label: 'Tableau de bord', icon: '🏥' },
+    { to: '/espace-medecin/patients', label: 'Patients', icon: '🧑‍⚕️' },
+    { to: '/espace-medecin/dossier', label: 'Dossier patient', icon: '📁' },
+    { to: '/espace-medecin/prescriptions', label: 'Prescriptions', icon: '🧾' },
+    { to: '/espace-medecin/communication', label: 'Communication', icon: '💬' },
+    { to: '/espace-medecin/rapports', label: 'Rapports', icon: '📝' },
   ];
 
   return (
-    <div className="container-fluid p-0">
-      <div className="row g-0 min-vh-100 align-items-stretch">
-        <div className="col-12 col-md-3 col-lg-2 p-0">
-          <SideBar title="Espace Médecin" items={menuItems} bg="bg-info" />
-        </div>
-        <main className="col-12 col-md-9 col-lg-10 py-4 px-3 px-md-4 min-vh-100 bg-light">
-          <Outlet />
-        </main>
-      </div>
-    </div>
+    <PortalLayout title="Espace Medecin" subtitle="Suivi clinique" items={menuItems} accent="info">
+      <Outlet />
+    </PortalLayout>
   );
 }
 
@@ -101,13 +65,18 @@ function App() {
             <Route path="statistiques-generales" element={<Espaceadmin section="stats" />} />
           </Route>
 
-          <Route path="/espacepatient" element={<PatientLayout />}>
-            <Route index element={<Navigate to="tableau-de-bord" replace />} />
-            <Route path="tableau-de-bord" element={<EspacePatient section="dashboard" />} />
-            <Route path="saisie-donnees" element={<EspacePatient section="saisie" />} />
-            <Route path="objectifs" element={<EspacePatient section="objectifs" />} />
-            <Route path="notifications" element={<EspacePatient section="notifications" />} />
-          </Route>
+          <Route path="/espacepatient" element={<EspacePatient section="dashboard" />} />
+          <Route path="/espacepatient/tableau-de-bord" element={<Navigate to="/espacepatient" replace />} />
+          <Route path="/espacepatient/saisie-donnees" element={<Navigate to="/espacepatient/vitals" replace />} />
+          <Route path="/espacepatient/objectifs" element={<Navigate to="/espacepatient/goals" replace />} />
+          <Route path="/espacepatient/notifications" element={<Navigate to="/espacepatient/history" replace />} />
+          <Route path="/espacepatient/vitals" element={<EspacePatient section="vitals" />} />
+          <Route path="/espacepatient/biometrics" element={<EspacePatient section="biometrics" />} />
+          <Route path="/espacepatient/activity" element={<EspacePatient section="activity" />} />
+          <Route path="/espacepatient/nutrition" element={<EspacePatient section="nutrition" />} />
+          <Route path="/espacepatient/pathology" element={<EspacePatient section="pathology" />} />
+          <Route path="/espacepatient/goals" element={<EspacePatient section="goals" />} />
+          <Route path="/espacepatient/history" element={<EspacePatient section="history" />} />
 
           <Route path="/espace-medecin" element={<MedecinLayout />}>
             <Route index element={<Navigate to="tableau-de-bord" replace />} />

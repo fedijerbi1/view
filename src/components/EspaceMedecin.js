@@ -1,395 +1,525 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useMemo, useState } from 'react';
-import { Alert, Badge, Button, Card, Col, Form, ListGroup, ProgressBar, Row, Table } from 'react-bootstrap';
-import Swal from 'sweetalert2';
-import { Bar, BarChart, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 
-const patientsSeed = [
-    { id: 1, nom: 'Amira', prenom: 'Saidi', age: 34, risk: 'Moyen', lastVisit: '2026-04-20', status: 'Suivi actif' },
-    { id: 2, nom: 'Youssef', prenom: 'Ben Ali', age: 46, risk: 'Élevé', lastVisit: '2026-04-18', status: 'RDV requis' },
-    { id: 3, nom: 'Nour', prenom: 'Trabelsi', age: 29, risk: 'Faible', lastVisit: '2026-04-25', status: 'Stable' },
-    { id: 4, nom: 'Sarra', prenom: 'Khelifi', age: 51, risk: 'Moyen', lastVisit: '2026-04-12', status: 'Traitement en cours' },
-];
+const C = {
+  bg: "#F0F7FF",
+  surface: "#FFFFFF",
+  surfaceAlt: "#F8FBFF",
+  primary: "#2E86C1",
+  primaryLight: "#AED6F1",
+  primaryDark: "#1A5276",
+  accent: "#27AE60",
+  accentLight: "#A9DFBF",
+  warning: "#E67E22",
+  danger: "#E74C3C",
+  dangerLight: "#FADBD8",
+  text: "#1B2631",
+  textMid: "#566573",
+  textLight: "#AEB6BF",
+  border: "#D6EAF8",
+  borderMid: "#A9CCE3",
+  cardShadow: "0 2px 12px rgba(46,134,193,0.08)",
+};
+
+const API_BASE = "http://localhost:5000/api";
 
 const consultationTrend = [
-    { day: 'Lun', visites: 8, messages: 12, prescriptions: 5 },
-    { day: 'Mar', visites: 10, messages: 9, prescriptions: 6 },
-    { day: 'Mer', visites: 12, messages: 14, prescriptions: 7 },
-    { day: 'Jeu', visites: 9, messages: 8, prescriptions: 4 },
-    { day: 'Ven', visites: 14, messages: 16, prescriptions: 9 },
-    { day: 'Sam', visites: 7, messages: 5, prescriptions: 3 },
+  { day: "Lun", visites: 8, messages: 12, prescriptions: 5 },
+  { day: "Mar", visites: 10, messages: 9, prescriptions: 6 },
+  { day: "Mer", visites: 12, messages: 14, prescriptions: 7 },
+  { day: "Jeu", visites: 9, messages: 8, prescriptions: 4 },
+  { day: "Ven", visites: 14, messages: 16, prescriptions: 9 },
+  { day: "Sam", visites: 7, messages: 5, prescriptions: 3 },
 ];
 
-const pathologySplit = [
-    { name: 'Cardio', value: 35, color: '#0d6efd' },
-    { name: 'Diabète', value: 28, color: '#dc3545' },
-    { name: 'Respiratoire', value: 18, color: '#198754' },
-    { name: 'Autres', value: 19, color: '#6c757d' },
-];
+const formatDate = (dateValue) => {
+  if (!dateValue) return "";
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.valueOf())) return "";
+  return parsed.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" });
+};
 
-function StatCard({ title, value, text, variant = 'primary' }) {
-    return (
-        <Card className="shadow-sm border-0 h-100">
-            <Card.Body>
-                <div className={`text-${variant} fw-semibold small text-uppercase`}>{title}</div>
-                <div className="h3 mb-1">{value}</div>
-                <div className="text-muted small">{text}</div>
-            </Card.Body>
-        </Card>
-    );
+const daysSince = (dateValue) => {
+  if (!dateValue) return null;
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.valueOf())) return null;
+  return Math.round((Date.now() - parsed.getTime()) / 86400000);
+};
+
+const riskLevel = (bpm, glycemie) => {
+  if ((bpm && bpm >= 95) || (glycemie && glycemie >= 7)) return "Élevé";
+  if ((bpm && bpm >= 85) || (glycemie && glycemie >= 6.1)) return "Moyen";
+  return "Faible";
+};
+
+const riskColor = (risk) => {
+  if (risk === "Élevé") return "danger";
+  if (risk === "Moyen") return "warning";
+  return "success";
+};
+
+function Badge({ color, children }) {
+  const colors = {
+    success: { bg: "#EAFAF1", text: "#1E8449" },
+    warning: { bg: "#FEF9E7", text: "#B7770D" },
+    danger: { bg: "#FDEDEC", text: "#A93226" },
+    info: { bg: "#EBF5FB", text: "#1A5276" },
+  };
+  const c = colors[color] || colors.info;
+  return (
+    <span style={{ background: c.bg, color: c.text, borderRadius: 20, padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>
+      {children}
+    </span>
+  );
 }
 
-export default function EspaceMedecin({ section = 'dashboard' }) {
-    const [patients, setPatients] = useState(patientsSeed);
-    const [selectedPatientId, setSelectedPatientId] = useState(1);
-    const [search, setSearch] = useState('');
-    const [prescriptionForm, setPrescriptionForm] = useState({ patient: 'Amira Saidi', medicine: '', dosage: '', duration: '' });
-    const [prescriptions, setPrescriptions] = useState([
-        { id: 1, patient: 'Amira Saidi', medicine: 'Paracétamol', dosage: '500 mg', duration: '5 jours' },
-    ]);
-    const [messageForm, setMessageForm] = useState({ patient: 'Amira Saidi', subject: '', body: '' });
-    const [messages, setMessages] = useState([
-        { id: 1, patient: 'Youssef Ben Ali', subject: 'Rappel de contrôle', status: 'Répondu' },
-        { id: 2, patient: 'Sarra Khelifi', subject: 'Résultats biologiques', status: 'En attente' },
-    ]);
-    const [reportForm, setReportForm] = useState({ period: 'Hebdomadaire', focus: 'Cardio' });
+function Card({ children, style = {} }) {
+  return (
+    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: C.cardShadow, padding: "20px 24px", ...style }}>
+      {children}
+    </div>
+  );
+}
 
-    const selectedPatient = useMemo(() => patients.find((patient) => patient.id === selectedPatientId) || patients[0], [patients, selectedPatientId]);
+function SectionTitle({ children, sub }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: C.primaryDark, letterSpacing: "-0.3px" }}>{children}</h2>
+      {sub && <p style={{ margin: "4px 0 0", fontSize: 13, color: C.textMid }}>{sub}</p>}
+    </div>
+  );
+}
 
-    const filteredPatients = useMemo(() => {
-        const query = search.trim().toLowerCase();
-        if (!query) return patients;
-        return patients.filter((patient) =>
-            `${patient.nom} ${patient.prenom} ${patient.status} ${patient.risk}`.toLowerCase().includes(query),
+function StatTile({ label, value, hint, icon }) {
+  return (
+    <div style={{ background: C.surfaceAlt, border: `1px solid ${C.border}`, borderRadius: 14, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: 13, color: C.textMid, fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: 18 }}>{icon}</span>
+      </div>
+      <div style={{ fontSize: 26, fontWeight: 700, color: C.text }}>{value}</div>
+      <div style={{ fontSize: 12, color: C.textLight }}>{hint}</div>
+    </div>
+  );
+}
+
+function BarChart({ data, valueKey, color }) {
+  const maxVal = Math.max(1, ...data.map(d => d[valueKey])) * 1.1;
+  return (
+    <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 120 }}>
+      {data.map((d, i) => {
+        const h = Math.round((d[valueKey] / maxVal) * 100);
+        return (
+          <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <div style={{ fontSize: 11, color: C.textLight }}>{d[valueKey]}</div>
+            <div style={{ width: "100%", height: h, background: color, borderRadius: "6px 6px 0 0" }} />
+            <div style={{ fontSize: 11, color: C.textMid }}>{d.day}</div>
+          </div>
         );
-    }, [patients, search]);
+      })}
+    </div>
+  );
+}
 
-    const dashboardStats = [
-        { title: 'Patients suivis', value: patients.length, text: 'Dossiers actifs', variant: 'primary' },
-        { title: 'Consultations', value: 42, text: 'Cette semaine', variant: 'success' },
-        { title: 'Messages', value: messages.length, text: 'Demandes à traiter', variant: 'warning' },
-        { title: 'Ordonnances', value: prescriptions.length, text: 'Émises récemment', variant: 'info' },
-    ];
+export default function EspaceMedecin({ section = "dashboard" }) {
+  const [patients, setPatients] = useState([]);
+  const [selectedPatientId, setSelectedPatientId] = useState(null);
+  const [overview, setOverview] = useState(null);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const patientCards = [
-        { title: 'Suivi clinique', value: 'Actif', text: 'Dernier contrôle à jour' },
-        { title: 'Dernier rendez-vous', value: selectedPatient.lastVisit, text: selectedPatient.status },
-        { title: 'Niveau de risque', value: selectedPatient.risk, text: 'Basé sur les dernières mesures' },
-    ];
+  const [prescriptionForm, setPrescriptionForm] = useState({ patientId: "", medicine: "", dosage: "", duration: "", notes: "" });
+  const [messageForm, setMessageForm] = useState({ patientId: "", subject: "", body: "" });
+  const [reportForm, setReportForm] = useState({ patientId: "", period: "Hebdomadaire", focus: "Cardio", summary: "" });
 
-    const handlePrescriptionSubmit = (event) => {
-        event.preventDefault();
-        setPrescriptions((current) => [
-            { id: Date.now(), patient: prescriptionForm.patient, medicine: prescriptionForm.medicine, dosage: prescriptionForm.dosage, duration: prescriptionForm.duration },
-            ...current,
+  const token = localStorage.getItem("token");
+  const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [patientsRes, prescriptionsRes, messagesRes, reportsRes] = await Promise.all([
+          axios.get(`${API_BASE}/medecin/patients`, { headers }),
+          axios.get(`${API_BASE}/medecin/prescriptions`, { headers }),
+          axios.get(`${API_BASE}/medecin/messages`, { headers }),
+          axios.get(`${API_BASE}/medecin/reports`, { headers }),
         ]);
-        Swal.fire('Ordonnance créée', 'La prescription a été ajoutée.', 'success');
+
+        setPatients(patientsRes.data || []);
+        setPrescriptions(prescriptionsRes.data || []);
+        setMessages(messagesRes.data || []);
+        setReports(reportsRes.data || []);
+
+        if ((patientsRes.data || []).length && !selectedPatientId) {
+          const firstId = patientsRes.data[0].id;
+          setSelectedPatientId(firstId);
+          setPrescriptionForm((prev) => ({ ...prev, patientId: firstId }));
+          setMessageForm((prev) => ({ ...prev, patientId: firstId }));
+          setReportForm((prev) => ({ ...prev, patientId: firstId }));
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleMessageSubmit = (event) => {
-        event.preventDefault();
-        setMessages((current) => [
-            { id: Date.now(), patient: messageForm.patient, subject: messageForm.subject, status: 'Envoyé' },
-            ...current,
-        ]);
-        Swal.fire('Message envoyé', 'Le patient a reçu un nouveau message.', 'success');
+    load();
+  }, [headers, token]);
+
+  useEffect(() => {
+    if (!token || !selectedPatientId) return;
+
+    const loadOverview = async () => {
+      const response = await axios.get(`${API_BASE}/medecin/patients/${selectedPatientId}/overview`, { headers });
+      setOverview(response.data || null);
     };
 
-    const handleReportSubmit = (event) => {
-        event.preventDefault();
-        Swal.fire('Rapport généré', `Rapport ${reportForm.period.toLowerCase()} sur ${reportForm.focus.toLowerCase()} prêt à être exporté.`, 'success');
-    };
+    loadOverview();
+  }, [headers, selectedPatientId, token]);
 
-    const handlePatientUpdate = (patientId, status) => {
-        setPatients((current) => current.map((patient) => (patient.id === patientId ? { ...patient, status } : patient)));
-        Swal.fire('Statut mis à jour', 'Le dossier du patient a été modifié.', 'success');
-    };
+  const patientOptions = useMemo(() => (
+    patients.map((p) => ({
+      ...p,
+      risk: riskLevel(p.last_bpm, p.last_glycemie),
+      status: daysSince(p.last_visit) !== null && daysSince(p.last_visit) <= 30 ? "Suivi actif" : "RDV requis",
+    }))
+  ), [patients]);
 
-    return (
-        <div className="d-flex flex-column gap-4">
-            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div>
-                    <h1 className="h3 mb-1">Espace Médecin</h1>
-                    <p className="text-muted mb-0">Pilotage des patients, prescriptions et rapports médicaux.</p>
-                </div>
-                <Badge bg="info" className="p-2">Accès sécurisé médecin</Badge>
-            </div>
+  const dashboardStats = [
+    { label: "Patients suivis", value: patients.length, hint: "Dossiers actifs", icon: "🧑‍⚕️" },
+    { label: "Prescriptions", value: prescriptions.length, hint: "En cours", icon: "🧾" },
+    { label: "Messages", value: messages.length, hint: "A traiter", icon: "💬" },
+    { label: "Rapports", value: reports.length, hint: "Generes", icon: "📄" },
+  ];
 
-            {section === 'dashboard' && (
-                <>
-                    <Row className="g-3">
-                        {dashboardStats.map((stat) => (
-                            <Col md={6} xl={3} key={stat.title}><StatCard {...stat} /></Col>
-                        ))}
-                    </Row>
+  const handlePrescriptionSubmit = async () => {
+    if (!prescriptionForm.patientId || !prescriptionForm.medicine) return;
+    const response = await axios.post(`${API_BASE}/medecin/prescriptions`, prescriptionForm, { headers });
+    setPrescriptions((current) => [response.data, ...current]);
+    setPrescriptionForm((prev) => ({ ...prev, medicine: "", dosage: "", duration: "", notes: "" }));
+  };
 
-                    <Row className="g-4">
-                        <Col lg={8}>
-                            <Card className="shadow-sm border-0 h-100">
-                                <Card.Body>
-                                    <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                                        <div>
-                                            <h2 className="h5 mb-1">Activité médicale de la semaine</h2>
-                                            <p className="text-muted mb-0">Consultations, messages et prescriptions.</p>
-                                        </div>
-                                        <Badge bg="primary">Temps réel</Badge>
-                                    </div>
-                                    <div style={{ width: '100%', height: 300 }}>
-                                        <ResponsiveContainer>
-                                            <LineChart data={consultationTrend}>
-                                                <XAxis dataKey="day" />
-                                                <YAxis />
-                                                <Tooltip />
-                                                <Line type="monotone" dataKey="visites" stroke="#0d6efd" strokeWidth={3} />
-                                                <Line type="monotone" dataKey="messages" stroke="#198754" strokeWidth={3} />
-                                                <Line type="monotone" dataKey="prescriptions" stroke="#dc3545" strokeWidth={3} />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </Card.Body>
-                            </Card>
-                        </Col>
+  const handleSelectPatient = (patientId) => {
+    setSelectedPatientId(patientId);
+    setPrescriptionForm((prev) => ({ ...prev, patientId }));
+    setMessageForm((prev) => ({ ...prev, patientId }));
+    setReportForm((prev) => ({ ...prev, patientId }));
+  };
 
-                        <Col lg={4}>
-                            <Card className="shadow-sm border-0 h-100">
-                                <Card.Body>
-                                    <h2 className="h5 mb-3">Répartition des pathologies</h2>
-                                    <div style={{ width: '100%', height: 240 }}>
-                                        <ResponsiveContainer>
-                                            <PieChart>
-                                                <Pie data={pathologySplit} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                                                    {pathologySplit.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
-                                                </Pie>
-                                                <Tooltip />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                    <ListGroup variant="flush">
-                                        {pathologySplit.map((item) => (
-                                            <ListGroup.Item key={item.name} className="d-flex justify-content-between align-items-center px-0">
-                                                <span>{item.name}</span>
-                                                <Badge bg="light" text="dark">{item.value}%</Badge>
-                                            </ListGroup.Item>
-                                        ))}
-                                    </ListGroup>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
-                </>
-            )}
+  const handleMessageSubmit = async () => {
+    if (!messageForm.patientId || !messageForm.subject || !messageForm.body) return;
+    const response = await axios.post(`${API_BASE}/medecin/messages`, messageForm, { headers });
+    setMessages((current) => [response.data, ...current]);
+    setMessageForm((prev) => ({ ...prev, subject: "", body: "" }));
+  };
 
-            {section === 'patients' && (
-                <Card className="shadow-sm border-0">
-                    <Card.Body>
-                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
-                            <div>
-                                <h2 className="h5 mb-1">Liste des patients</h2>
-                                <p className="text-muted mb-0">Filtrer, suivre et mettre à jour le statut des patients.</p>
-                            </div>
-                            <Form.Control style={{ maxWidth: 280 }} placeholder="Rechercher un patient" value={search} onChange={(e) => setSearch(e.target.value)} />
-                        </div>
+  const handleReportSubmit = async () => {
+    if (!reportForm.period || !reportForm.focus) return;
+    const response = await axios.post(`${API_BASE}/medecin/reports`, reportForm, { headers });
+    setReports((current) => [response.data, ...current]);
+    setReportForm((prev) => ({ ...prev, summary: "" }));
+  };
 
-                        <Table responsive hover className="align-middle">
-                            <thead><tr><th>Nom</th><th>Âge</th><th>Risque</th><th>Dernière visite</th><th>Status</th><th>Action</th></tr></thead>
-                            <tbody>
-                                {filteredPatients.map((patient) => (
-                                    <tr key={patient.id}>
-                                        <td>{patient.nom} {patient.prenom}</td>
-                                        <td>{patient.age}</td>
-                                        <td><Badge bg={patient.risk === 'Élevé' ? 'danger' : patient.risk === 'Moyen' ? 'warning' : 'success'}>{patient.risk}</Badge></td>
-                                        <td>{patient.lastVisit}</td>
-                                        <td>{patient.status}</td>
-                                        <td>
-                                            <Button size="sm" variant="outline-primary" className="me-2" onClick={() => setSelectedPatientId(patient.id)}>Ouvrir</Button>
-                                            <Button size="sm" variant="outline-secondary" onClick={() => handlePatientUpdate(patient.id, 'Contrôle planifié')}>Planifier</Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
-                    </Card.Body>
-                </Card>
-            )}
-
-            {section === 'dossier' && (
-                <Row className="g-4">
-                    <Col lg={4}>
-                        <Card className="shadow-sm border-0 h-100">
-                            <Card.Body>
-                                <h2 className="h5 mb-3">Choisir un patient</h2>
-                                <ListGroup>
-                                    {patients.map((patient) => (
-                                        <ListGroup.Item key={patient.id} action active={patient.id === selectedPatient.id} onClick={() => setSelectedPatientId(patient.id)}>
-                                            <div className="fw-semibold">{patient.nom} {patient.prenom}</div>
-                                            <small>{patient.risk} - {patient.status}</small>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
-                    <Col lg={8}>
-                        <Row className="g-3 mb-3">
-                            {patientCards.map((card) => (
-                                <Col md={4} key={card.title}><StatCard {...card} /></Col>
-                            ))}
-                        </Row>
-                        <Card className="shadow-sm border-0 mb-3">
-                            <Card.Body>
-                                <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                    <div>
-                                        <h2 className="h5 mb-1">Dossier de {selectedPatient.nom} {selectedPatient.prenom}</h2>
-                                        <p className="text-muted mb-0">Synthèse clinique et évolution récente.</p>
-                                    </div>
-                                    <Badge bg={selectedPatient.risk === 'Élevé' ? 'danger' : selectedPatient.risk === 'Moyen' ? 'warning' : 'success'}>{selectedPatient.risk}</Badge>
-                                </div>
-                                <Row className="g-3 mt-2">
-                                    <Col md={6}><Alert variant="light">Dernier contrôle: {selectedPatient.lastVisit}</Alert></Col>
-                                    <Col md={6}><Alert variant="info">Statut actuel: {selectedPatient.status}</Alert></Col>
-                                </Row>
-                                <ProgressBar now={selectedPatient.risk === 'Élevé' ? 85 : selectedPatient.risk === 'Moyen' ? 58 : 22} label="Indice de suivi" />
-                            </Card.Body>
-                        </Card>
-                        <Card className="shadow-sm border-0">
-                            <Card.Body>
-                                <h6>Plan d'action</h6>
-                                <Row className="g-3">
-                                    <Col md={4}><Button className="w-100" variant="outline-primary">Consulter historique</Button></Col>
-                                    <Col md={4}><Button className="w-100" variant="outline-success">Planifier contrôle</Button></Col>
-                                    <Col md={4}><Button className="w-100" variant="outline-warning">Alerter patient</Button></Col>
-                                </Row>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            )}
-
-            {section === 'prescriptions' && (
-                <Row className="g-4">
-                    <Col lg={5}>
-                        <Card className="shadow-sm border-0 h-100">
-                            <Card.Body>
-                                <h2 className="h5 mb-3">Créer une prescription</h2>
-                                <Form onSubmit={handlePrescriptionSubmit}>
-                                    <Form.Select className="mb-3" value={prescriptionForm.patient} onChange={(e) => setPrescriptionForm({ ...prescriptionForm, patient: e.target.value })}>
-                                        {patients.map((patient) => <option key={patient.id}>{patient.nom} {patient.prenom}</option>)}
-                                    </Form.Select>
-                                    <Form.Control className="mb-3" placeholder="Médicament" value={prescriptionForm.medicine} onChange={(e) => setPrescriptionForm({ ...prescriptionForm, medicine: e.target.value })} />
-                                    <Row className="g-2 mb-3">
-                                        <Col md={6}><Form.Control placeholder="Dosage" value={prescriptionForm.dosage} onChange={(e) => setPrescriptionForm({ ...prescriptionForm, dosage: e.target.value })} /></Col>
-                                        <Col md={6}><Form.Control placeholder="Durée" value={prescriptionForm.duration} onChange={(e) => setPrescriptionForm({ ...prescriptionForm, duration: e.target.value })} /></Col>
-                                    </Row>
-                                    <Button type="submit" className="w-100">Valider la prescription</Button>
-                                </Form>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg={7}>
-                        <Card className="shadow-sm border-0 h-100">
-                            <Card.Body>
-                                <h2 className="h5 mb-3">Ordonnances récentes</h2>
-                                <Table responsive hover>
-                                    <thead><tr><th>Patient</th><th>Médicament</th><th>Dosage</th><th>Durée</th></tr></thead>
-                                    <tbody>
-                                        {prescriptions.map((item) => (
-                                            <tr key={item.id}><td>{item.patient}</td><td>{item.medicine}</td><td>{item.dosage}</td><td>{item.duration}</td></tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            )}
-
-            {section === 'communication' && (
-                <Row className="g-4">
-                    <Col lg={5}>
-                        <Card className="shadow-sm border-0 h-100">
-                            <Card.Body>
-                                <h2 className="h5 mb-3">Envoyer un message</h2>
-                                <Form onSubmit={handleMessageSubmit}>
-                                    <Form.Select className="mb-3" value={messageForm.patient} onChange={(e) => setMessageForm({ ...messageForm, patient: e.target.value })}>
-                                        {patients.map((patient) => <option key={patient.id}>{patient.nom} {patient.prenom}</option>)}
-                                    </Form.Select>
-                                    <Form.Control className="mb-3" placeholder="Objet" value={messageForm.subject} onChange={(e) => setMessageForm({ ...messageForm, subject: e.target.value })} />
-                                    <Form.Control as="textarea" rows={6} className="mb-3" placeholder="Contenu du message" value={messageForm.body} onChange={(e) => setMessageForm({ ...messageForm, body: e.target.value })} />
-                                    <Button type="submit" className="w-100">Envoyer</Button>
-                                </Form>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg={7}>
-                        <Card className="shadow-sm border-0 h-100">
-                            <Card.Body>
-                                <h2 className="h5 mb-3">Messagerie patients</h2>
-                                <ListGroup>
-                                    {messages.map((message) => (
-                                        <ListGroup.Item key={message.id} className="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <div className="fw-semibold">{message.patient}</div>
-                                                <small>{message.subject}</small>
-                                            </div>
-                                            <Badge bg={message.status === 'Répondu' ? 'success' : message.status === 'Envoyé' ? 'info' : 'warning'}>{message.status}</Badge>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            )}
-
-            {section === 'rapports' && (
-                <Row className="g-4">
-                    <Col lg={4}>
-                        <Card className="shadow-sm border-0 h-100">
-                            <Card.Body>
-                                <h2 className="h5 mb-3">Générer un rapport</h2>
-                                <Form onSubmit={handleReportSubmit}>
-                                    <Form.Label>Période</Form.Label>
-                                    <Form.Select className="mb-3" value={reportForm.period} onChange={(e) => setReportForm({ ...reportForm, period: e.target.value })}>
-                                        <option>Hebdomadaire</option><option>Mensuel</option><option>Trimestriel</option>
-                                    </Form.Select>
-                                    <Form.Label>Focus</Form.Label>
-                                    <Form.Select className="mb-3" value={reportForm.focus} onChange={(e) => setReportForm({ ...reportForm, focus: e.target.value })}>
-                                        <option>Cardio</option><option>Diabète</option><option>Respiratoire</option>
-                                    </Form.Select>
-                                    <Button type="submit" className="w-100">Générer le rapport</Button>
-                                </Form>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg={8}>
-                        <Row className="g-3 mb-3">
-                            <Col md={6}>
-                                <Card className="shadow-sm border-0 h-100"><Card.Body><h6>Export</h6><p className="text-muted">PDF, CSV et envoi automatique par messagerie sécurisée.</p><Button variant="outline-primary">Exporter le rapport</Button></Card.Body></Card>
-                            </Col>
-                            <Col md={6}>
-                                <Card className="shadow-sm border-0 h-100"><Card.Body><h6>Suivi synthétique</h6><p className="text-muted">Synthèse des consultations, prescriptions et recommandations.</p><Button variant="outline-success">Partager avec le patient</Button></Card.Body></Card>
-                            </Col>
-                        </Row>
-                        <Card className="shadow-sm border-0">
-                            <Card.Body>
-                                <h6>Activité hebdomadaire</h6>
-                                <div style={{ width: '100%', height: 240 }}>
-                                    <ResponsiveContainer>
-                                        <BarChart data={consultationTrend}>
-                                            <XAxis dataKey="day" />
-                                            <YAxis />
-                                            <Tooltip />
-                                            <Bar dataKey="visites" fill="#0d6efd" radius={[6, 6, 0, 0]} />
-                                            <Bar dataKey="prescriptions" fill="#198754" radius={[6, 6, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            )}
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: C.text }}>Espace Medecin</h1>
+          <p style={{ margin: "6px 0 0", color: C.textMid }}>Pilotage des patients, prescriptions et communications cliniques.</p>
         </div>
-    );
+        <Badge color="info">Acces securise</Badge>
+      </div>
+
+      {section === "dashboard" && (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            {dashboardStats.map((stat) => (
+              <StatTile key={stat.label} {...stat} />
+            ))}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 16 }}>
+            <Card>
+              <SectionTitle sub="Consultations, messages et prescriptions">Activite medicale</SectionTitle>
+              <BarChart data={consultationTrend} valueKey="visites" color={C.primary} />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 16 }}>
+                <div style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                  <div style={{ fontSize: 12, color: C.textLight }}>Messages</div>
+                  <div style={{ fontWeight: 700 }}>{messages.length}</div>
+                </div>
+                <div style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                  <div style={{ fontSize: 12, color: C.textLight }}>Prescriptions</div>
+                  <div style={{ fontWeight: 700 }}>{prescriptions.length}</div>
+                </div>
+                <div style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                  <div style={{ fontSize: 12, color: C.textLight }}>Rapports</div>
+                  <div style={{ fontWeight: 700 }}>{reports.length}</div>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <SectionTitle sub="Patients prioritaires">Alertes cliniques</SectionTitle>
+              {patientOptions.slice(0, 4).map((p) => (
+                <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{p.prenom} {p.nom}</div>
+                    <div style={{ fontSize: 12, color: C.textLight }}>Dernier controle: {formatDate(p.last_visit) || "N/A"}</div>
+                  </div>
+                  <Badge color={riskColor(p.risk)}>{p.risk}</Badge>
+                </div>
+              ))}
+              {patientOptions.length === 0 && (
+                <div style={{ fontSize: 13, color: C.textLight }}>Aucun patient attribue.</div>
+              )}
+            </Card>
+          </div>
+        </>
+      )}
+
+      {section === "patients" && (
+        <Card>
+          <SectionTitle sub="Filtrer, suivre et mettre a jour les dossiers">Liste des patients</SectionTitle>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            <thead>
+              <tr style={{ background: C.surfaceAlt }}>
+                {["Patient", "Age", "Risque", "Derniere visite", "Statut", "Action"].map((h) => (
+                  <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: 12, color: C.textMid, borderBottom: `1px solid ${C.border}` }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {patientOptions.map((patient) => (
+                <tr key={patient.id} style={{ borderBottom: `1px solid ${C.border}` }}>
+                  <td style={{ padding: "10px 12px", fontWeight: 600 }}>{patient.prenom} {patient.nom}</td>
+                  <td style={{ padding: "10px 12px" }}>{patient.age || "--"}</td>
+                  <td style={{ padding: "10px 12px" }}><Badge color={riskColor(patient.risk)}>{patient.risk}</Badge></td>
+                  <td style={{ padding: "10px 12px" }}>{formatDate(patient.last_visit) || "--"}</td>
+                  <td style={{ padding: "10px 12px" }}>{patient.status}</td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <button onClick={() => handleSelectPatient(patient.id)} style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${C.borderMid}`, background: "transparent", cursor: "pointer", marginRight: 6 }}>Ouvrir</button>
+                    <button style={{ padding: "6px 10px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", cursor: "pointer" }}>Planifier</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+
+      {section === "dossier" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 16 }}>
+          <Card>
+            <SectionTitle sub="Selectionner un patient">Patient suivi</SectionTitle>
+            {patientOptions.map((patient) => (
+              <button key={patient.id} onClick={() => handleSelectPatient(patient.id)}
+                style={{ width: "100%", textAlign: "left", padding: "10px 12px", borderRadius: 10, border: `1px solid ${selectedPatientId === patient.id ? C.primary : C.border}`, background: selectedPatientId === patient.id ? `${C.primary}12` : "transparent", marginBottom: 8, cursor: "pointer" }}>
+                <div style={{ fontWeight: 600 }}>{patient.prenom} {patient.nom}</div>
+                <div style={{ fontSize: 12, color: C.textLight }}>{patient.status} · {patient.risk}</div>
+              </button>
+            ))}
+            {patientOptions.length === 0 && (
+              <div style={{ fontSize: 13, color: C.textLight }}>Aucun patient attribue.</div>
+            )}
+          </Card>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <Card>
+              <SectionTitle sub="Synthese clinique">Dossier patient</SectionTitle>
+              {loading && <div style={{ color: C.textLight }}>Chargement...</div>}
+              {!loading && !overview && <div style={{ color: C.textLight }}>Selectionnez un patient.</div>}
+              {overview && (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <div>
+                      <div style={{ fontWeight: 700 }}>{overview.patient.prenom} {overview.patient.nom}</div>
+                      <div style={{ fontSize: 12, color: C.textLight }}>Age: {overview.patient.age || "--"} · Tel: {overview.patient.telephone || "--"}</div>
+                    </div>
+                    <Badge color={riskColor(riskLevel(overview.vitals?.bpm, overview.pathology?.glycemie))}>Risque {riskLevel(overview.vitals?.bpm, overview.pathology?.glycemie)}</Badge>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                    <div style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 12, color: C.textLight }}>Derniere visite</div>
+                      <div style={{ fontWeight: 700 }}>{formatDate(overview.vitals?.measure_date) || "--"}</div>
+                    </div>
+                    <div style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 12, color: C.textLight }}>IMC</div>
+                      <div style={{ fontWeight: 700 }}>{overview.biometrics?.imc || "--"}</div>
+                    </div>
+                    <div style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 12, color: C.textLight }}>SpO2</div>
+                      <div style={{ fontWeight: 700 }}>{overview.pathology?.spo2 || "--"}%</div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </Card>
+
+            <Card>
+              <SectionTitle sub="Dernieres mesures">Indicateurs cles</SectionTitle>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                {[
+                  { label: "FC", value: overview?.vitals?.bpm || "--", unit: "bpm" },
+                  { label: "TA", value: overview?.vitals ? `${overview.vitals.sys}/${overview.vitals.dia}` : "--", unit: "mmHg" },
+                  { label: "Temperature", value: overview?.vitals?.temp || "--", unit: "°C" },
+                  { label: "Poids", value: overview?.biometrics?.poids || "--", unit: "kg" },
+                  { label: "Glycemie", value: overview?.pathology?.glycemie || "--", unit: "mmol/L" },
+                  { label: "SpO2", value: overview?.pathology?.spo2 || "--", unit: "%" },
+                ].map((item) => (
+                  <div key={item.label} style={{ background: C.surfaceAlt, borderRadius: 10, padding: "10px 12px" }}>
+                    <div style={{ fontSize: 12, color: C.textLight }}>{item.label}</div>
+                    <div style={{ fontWeight: 700 }}>{item.value} {item.unit}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {section === "prescriptions" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 16 }}>
+          <Card>
+            <SectionTitle sub="Nouvelle prescription">Creer une ordonnance</SectionTitle>
+            <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
+            <select value={prescriptionForm.patientId} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, patientId: e.target.value }))}
+              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              {patientOptions.map((p) => (
+                <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
+              ))}
+            </select>
+            <input value={prescriptionForm.medicine} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, medicine: e.target.value }))}
+              placeholder="Medicament" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}`, marginBottom: 12 }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <input value={prescriptionForm.dosage} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, dosage: e.target.value }))}
+                placeholder="Dosage" style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+              <input value={prescriptionForm.duration} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, duration: e.target.value }))}
+                placeholder="Duree" style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+            </div>
+            <textarea value={prescriptionForm.notes} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, notes: e.target.value }))}
+              placeholder="Notes cliniques" rows={3} style={{ width: "100%", marginTop: 12, padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+            <button onClick={handlePrescriptionSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+              Valider la prescription
+            </button>
+          </Card>
+
+          <Card>
+            <SectionTitle sub="Ordonnances recentes">Historique</SectionTitle>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: C.surfaceAlt }}>
+                  {["Patient", "Medicament", "Dosage", "Duree"].map((h) => (
+                    <th key={h} style={{ padding: "10px 12px", textAlign: "left", fontSize: 12, color: C.textMid, borderBottom: `1px solid ${C.border}` }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {prescriptions.map((item) => (
+                  <tr key={item.id} style={{ borderBottom: `1px solid ${C.border}` }}>
+                    <td style={{ padding: "10px 12px" }}>{item.patient_label || item.patient_name || "--"}</td>
+                    <td style={{ padding: "10px 12px", fontWeight: 600 }}>{item.medicine}</td>
+                    <td style={{ padding: "10px 12px" }}>{item.dosage || "--"}</td>
+                    <td style={{ padding: "10px 12px" }}>{item.duration || "--"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
+
+      {section === "communication" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 16 }}>
+          <Card>
+            <SectionTitle sub="Nouveau message">Messagerie patient</SectionTitle>
+            <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
+            <select value={messageForm.patientId} onChange={(e) => setMessageForm((prev) => ({ ...prev, patientId: e.target.value }))}
+              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              {patientOptions.map((p) => (
+                <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
+              ))}
+            </select>
+            <input value={messageForm.subject} onChange={(e) => setMessageForm((prev) => ({ ...prev, subject: e.target.value }))}
+              placeholder="Objet" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}`, marginBottom: 12 }} />
+            <textarea value={messageForm.body} onChange={(e) => setMessageForm((prev) => ({ ...prev, body: e.target.value }))}
+              placeholder="Contenu du message" rows={6} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+            <button onClick={handleMessageSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+              Envoyer
+            </button>
+          </Card>
+
+          <Card>
+            <SectionTitle sub="Messages recents">Suivi des demandes</SectionTitle>
+            {messages.map((message) => (
+              <div key={message.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{message.patient_label || message.patient_name || "--"}</div>
+                  <div style={{ fontSize: 12, color: C.textLight }}>{message.subject}</div>
+                </div>
+                <Badge color={message.status === "replied" ? "success" : message.status === "sent" ? "info" : "warning"}>{message.status}</Badge>
+              </div>
+            ))}
+            {messages.length === 0 && (
+              <div style={{ fontSize: 13, color: C.textLight }}>Aucun message pour le moment.</div>
+            )}
+          </Card>
+        </div>
+      )}
+
+      {section === "rapports" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 16 }}>
+          <Card>
+            <SectionTitle sub="Generer un rapport">Synthese medicale</SectionTitle>
+            <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
+            <select value={reportForm.patientId} onChange={(e) => setReportForm((prev) => ({ ...prev, patientId: e.target.value }))}
+              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              <option value="">Tous les patients</option>
+              {patientOptions.map((p) => (
+                <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
+              ))}
+            </select>
+            <label style={{ fontSize: 12, color: C.textLight }}>Periode</label>
+            <select value={reportForm.period} onChange={(e) => setReportForm((prev) => ({ ...prev, period: e.target.value }))}
+              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              {"Hebdomadaire Mensuel Trimestriel".split(" ").map((opt) => (
+                <option key={opt}>{opt}</option>
+              ))}
+            </select>
+            <label style={{ fontSize: 12, color: C.textLight }}>Focus</label>
+            <select value={reportForm.focus} onChange={(e) => setReportForm((prev) => ({ ...prev, focus: e.target.value }))}
+              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              {"Cardio Diabete Respiratoire".split(" ").map((opt) => (
+                <option key={opt}>{opt}</option>
+              ))}
+            </select>
+            <textarea value={reportForm.summary} onChange={(e) => setReportForm((prev) => ({ ...prev, summary: e.target.value }))}
+              placeholder="Notes de synthese" rows={4} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+            <button onClick={handleReportSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+              Generer le rapport
+            </button>
+          </Card>
+
+          <Card>
+            <SectionTitle sub="Rapports disponibles">Historique</SectionTitle>
+            {reports.map((report) => (
+              <div key={report.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{report.focus} · {report.period}</div>
+                  <div style={{ fontSize: 12, color: C.textLight }}>{formatDate(report.created_at)}</div>
+                </div>
+                <Badge color="info">Pret</Badge>
+              </div>
+            ))}
+            {reports.length === 0 && (
+              <div style={{ fontSize: 13, color: C.textLight }}>Aucun rapport genere.</div>
+            )}
+          </Card>
+        </div>
+      )}
+    </div>
+  );
 }

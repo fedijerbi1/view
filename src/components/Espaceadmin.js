@@ -1,269 +1,225 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
-import Swal from 'sweetalert2';
-import axios from 'axios'; 
-import DataTable from 'react-data-table-component'; 
-import {
-  Bar,
-  BarChart,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
- const columns = [ 
-{ name:"id" , selector: row => row.id, sortable: true },
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import axios from "axios";
+import DataTable from "react-data-table-component";
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+
+const C = {
+  bg: "#F0F7FF",
+  surface: "#FFFFFF",
+  surfaceAlt: "#F8FBFF",
+  primary: "#2E86C1",
+  primaryLight: "#AED6F1",
+  primaryDark: "#1A5276",
+  accent: "#27AE60",
+  warning: "#E67E22",
+  danger: "#E74C3C",
+  text: "#1B2631",
+  textMid: "#566573",
+  textLight: "#AEB6BF",
+  border: "#D6EAF8",
+  borderMid: "#A9CCE3",
+  cardShadow: "0 2px 12px rgba(46,134,193,0.08)",
+};
+
+const columns = [
+  { name: "ID", selector: row => row.id, sortable: true },
   { name: "Nom", selector: row => row.nom, sortable: true },
   { name: "Email", selector: row => row.email, sortable: true },
- { name: "role", selector: row => row.role, sortable: true }, 
-  { name: "Téléphone", selector: row => row.telephone, sortable: true },
-  { name: "Date de creation ", selector: row => row.created_at, sortable: true }, 
-  {name:"last login ", selector: row => row.lastlog, sortable: true },
-]; 
+  { name: "Role", selector: row => row.role, sortable: true },
+  { name: "Telephone", selector: row => row.telephone, sortable: true },
+  { name: "Date creation", selector: row => row.created_at, sortable: true },
+  { name: "Last login", selector: row => row.lastlog, sortable: true },
+];
 
+function Card({ children, style = {} }) {
+  return (
+    <div style={{ background: C.surface, borderRadius: 16, border: `1px solid ${C.border}`, boxShadow: C.cardShadow, padding: "20px 24px", ...style }}>
+      {children}
+    </div>
+  );
+}
 
-export default function Espaceadmin ({ section = 'dashboard' }) {
-const navigate = useNavigate();
+function SectionTitle({ children, sub }) {
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: C.primaryDark, letterSpacing: "-0.3px" }}>{children}</h2>
+      {sub && <p style={{ margin: "4px 0 0", fontSize: 13, color: C.textMid }}>{sub}</p>}
+    </div>
+  );
+}
 
-const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/');
-};  
-const [users, setUsers] = useState([]);
-const [stats, setStats] = useState({
-  total_users: 0,
-  total_admins: 0,
-  total_medecins: 0,
-  active_30_days: 0,
-  new_this_month: 0,
-});
+function StatTile({ label, value, accent }) {
+  return (
+    <div style={{ background: C.surfaceAlt, border: `1px solid ${C.border}`, borderRadius: 14, padding: "16px 18px" }}>
+      <div style={{ fontSize: 12, color: C.textLight }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 700, color: accent }}>{value}</div>
+    </div>
+  );
+}
 
-useEffect (()=>{
-const fetchUsers = async ()=> { 
-    try { 
-        const token = localStorage.getItem ('token');  
+export default function Espaceadmin({ section = "dashboard" }) {
+  const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState({
+    total_users: 0,
+    total_admins: 0,
+    total_medecins: 0,
+    active_30_days: 0,
+    new_this_month: 0,
+  });
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem("token");
         if (!token) {
-            navigate('/');
-            return;
+          navigate("/");
+          return;
         }
 
-const [usersResponse, statsResponse] = await Promise.all([
-  axios.get("http://localhost:5000/api/users", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
-  axios.get("http://localhost:5000/api/users/stats", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
-]);
+        const [usersResponse, statsResponse] = await Promise.all([
+          axios.get("http://localhost:5000/api/users", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get("http://localhost:5000/api/users/stats", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
         setUsers(usersResponse.data || []);
         setStats(statsResponse.data || {});
+      } catch (error) {
+        Swal.fire("Erreur", "Erreur lors de la recuperation des donnees", "error");
+      }
+    };
 
+    fetchUsers();
+  }, [navigate]);
 
-} 
-catch (error) { 
-Swal.fire ("error" , 'Erreur lors de la récupération des données', 'error') ; 
-}
-}
-fetchUsers() ; 
+  const chartData = useMemo(() => {
+    const total = stats.total_users || 1;
 
+    return {
+      adminsPercent: Math.round(((stats.total_admins || 0) / total) * 100),
+      medecinsPercent: Math.round(((stats.total_medecins || 0) / total) * 100),
+      actifsPercent: Math.round(((stats.active_30_days || 0) / total) * 100),
+    };
+  }, [stats]);
 
+  const barChartData = useMemo(() => (
+    [
+      { name: "Admins", value: stats.total_admins || 0 },
+      { name: "Medecins", value: stats.total_medecins || 0 },
+      { name: "Actifs 30j", value: stats.active_30_days || 0 },
+      { name: "Nouveaux mois", value: stats.new_this_month || 0 },
+    ]
+  ), [stats]);
 
+  const pieChartData = useMemo(() => {
+    const admin = stats.total_admins || 0;
+    const medecin = stats.total_medecins || 0;
+    const other = Math.max((stats.total_users || 0) - admin - medecin, 0);
 
-},[navigate]);
+    return [
+      { name: "Admins", value: admin, color: C.warning },
+      { name: "Medecins", value: medecin, color: C.accent },
+      { name: "Autres", value: other, color: "#95A5A6" },
+    ];
+  }, [stats]);
 
-const chartData = useMemo(() => {
-  const total = stats.total_users || 1;
-
-  return {
-    adminsPercent: Math.round(((stats.total_admins || 0) / total) * 100),
-    medecinsPercent: Math.round(((stats.total_medecins || 0) / total) * 100),
-    actifsPercent: Math.round(((stats.active_30_days || 0) / total) * 100),
+  const tableStyles = {
+    rows: { style: { minHeight: "46px" } },
+    headCells: { style: { background: C.surfaceAlt, fontWeight: 700, color: C.textMid, textTransform: "uppercase", fontSize: 11 } },
+    cells: { style: { color: C.text } },
   };
-}, [stats]);
 
-const barChartData = useMemo(() => {
-  return [
-    { name: 'Admins', value: stats.total_admins || 0 },
-    { name: 'Medecins', value: stats.total_medecins || 0 },
-    { name: 'Actifs 30j', value: stats.active_30_days || 0 },
-    { name: 'Nouveaux mois', value: stats.new_this_month || 0 },
-  ];
-}, [stats]);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: C.text }}>Espace Admin</h1>
+          <p style={{ margin: "6px 0 0", color: C.textMid }}>Supervision des comptes et indicateurs globaux.</p>
+        </div>
+        <Link to="/create_medecin" style={{ background: C.primary, color: "#fff", padding: "10px 16px", borderRadius: 12, textDecoration: "none", fontWeight: 600 }}>
+          Creer un medecin
+        </Link>
+      </div>
 
-const pieChartData = useMemo(() => {
-  const admin = stats.total_admins || 0;
-  const medecin = stats.total_medecins || 0;
-  const other = Math.max((stats.total_users || 0) - admin - medecin, 0);
-
-  return [
-    { name: 'Admins', value: admin, color: '#ffc107' },
-    { name: 'Medecins', value: medecin, color: '#198754' },
-    { name: 'Autres', value: other, color: '#6c757d' },
-  ];
-}, [stats]);
-
-const roleDistribution = useMemo(() => {
-  const admin = stats.total_admins || 0;
-  const medecin = stats.total_medecins || 0;
-  const other = Math.max((stats.total_users || 0) - admin - medecin, 0);
-
-  return [
-    { label: 'Admins', value: admin, color: 'bg-warning' },
-    { label: 'Medecins', value: medecin, color: 'bg-success' },
-    { label: 'Autres', value: other, color: 'bg-secondary' },
-  ];
-}, [stats]);
-
-return (
-  <>
-      
-
-      {(section === 'dashboard' || section === 'stats') && (
-        <div className="row g-3 mb-4">
-          <div className="col-12 col-md-6 col-xl-3">
-            <div className="card text-bg-primary h-100">
-              <div className="card-body">
-                <h6 className="card-title mb-1">Total utilisateurs</h6>
-                <h3 className="mb-0">{stats.total_users}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-xl-3">
-            <div className="card text-bg-success h-100">
-              <div className="card-body">
-                <h6 className="card-title mb-1">Medecins</h6>
-                <h3 className="mb-0">{stats.total_medecins}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-xl-3">
-            <div className="card text-bg-warning h-100">
-              <div className="card-body">
-                <h6 className="card-title mb-1">Admins</h6>
-                <h3 className="mb-0">{stats.total_admins}</h3>
-              </div>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-xl-3">
-            <div className="card text-bg-info h-100">
-              <div className="card-body">
-                <h6 className="card-title mb-1">Actifs 30 jours</h6>
-                <h3 className="mb-0">{stats.active_30_days}</h3>
-              </div>
-            </div>
-          </div>
+      {(section === "dashboard" || section === "stats") && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+          <StatTile label="Total utilisateurs" value={stats.total_users} accent={C.primary} />
+          <StatTile label="Medecins" value={stats.total_medecins} accent={C.accent} />
+          <StatTile label="Admins" value={stats.total_admins} accent={C.warning} />
+          <StatTile label="Actifs 30 jours" value={stats.active_30_days} accent={C.primaryDark} />
         </div>
       )}
 
-      {section === 'dashboard' && (
-        <div className="card shadow-sm mb-4">
-          <div className="card-body">
-            <h2 className="h4 mb-2">Tableau de bord Admin</h2>
-            <h5 className="text-muted mb-4">Actions rapides et vue globale</h5>
-
-            <div className="list-group mb-3">
-              <Link to="/create_medecin" className="bg-primary list-group-item list-group-item-action text-white">
-                Creer un medecin
-              </Link>
-              
+      {section === "dashboard" && (
+        <Card>
+          <SectionTitle sub="Actions rapides et vue globale">Tableau de bord Admin</SectionTitle>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <div style={{ background: C.surfaceAlt, borderRadius: 12, padding: "16px 18px", minWidth: 220 }}>
+              <div style={{ fontSize: 12, color: C.textLight, marginBottom: 8 }}>Nouveaux utilisateurs ce mois</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: C.text }}>{stats.new_this_month || 0}</div>
             </div>
-
-            <p className="mb-0 text-muted">
-              Nouveaux utilisateurs ce mois: <strong>{stats.new_this_month || 0}</strong>
-            </p>
+            <div style={{ background: C.surfaceAlt, borderRadius: 12, padding: "16px 18px", minWidth: 220 }}>
+              <div style={{ fontSize: 12, color: C.textLight, marginBottom: 8 }}>Acces actifs</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: C.text }}>{stats.active_30_days || 0}</div>
+            </div>
           </div>
-        </div>
+        </Card>
       )}
 
-      {(section === 'dashboard' || section === 'stats') && (
-        <div className="card shadow-sm mb-4">
-          <div className="card-body">
-            <h5 className="mb-3">Statistiques generales</h5>
-
-            <div className="row g-4">
-              <div className="col-12 col-lg-7">
-                <h6 className="mb-3">Indicateurs principaux</h6>
-                <div style={{ width: '100%', height: 280 }}>
-                  <ResponsiveContainer>
-                    <BarChart data={barChartData}>
-                      <XAxis dataKey="name" />
-                      <YAxis allowDecimals={false} />
-                      <Tooltip />
-                      <Bar dataKey="value" fill="#0d6efd" radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="col-12 col-lg-5">
-                <h6 className="mb-3">Repartition des roles</h6>
-                <div style={{ width: '100%', height: 280 }}>
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie
-                        data={pieChartData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={90}
-                        label
-                      >
-                        {pieChartData.map((entry) => (
-                          <Cell key={entry.name} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+      {(section === "dashboard" || section === "stats") && (
+        <Card>
+          <SectionTitle sub="Roles et activite">Statistiques generales</SectionTitle>
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Indicateurs principaux</div>
+              <div style={{ width: "100%", height: 280 }}>
+                <ResponsiveContainer>
+                  <BarChart data={barChartData}>
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill={C.primary} radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
-
-            <hr className="my-4" />
-
-            <h6 className="mb-3">Pourcentages rapides</h6>
-            <div className="row g-2">
-              <div className="col-12 col-md-4">
-                <div className="alert alert-warning mb-0">Admins: {chartData.adminsPercent}%</div>
-              </div>
-              <div className="col-12 col-md-4">
-                <div className="alert alert-success mb-0">Medecins: {chartData.medecinsPercent}%</div>
-              </div>
-              <div className="col-12 col-md-4">
-                <div className="alert alert-info mb-0">Actifs 30j: {chartData.actifsPercent}%</div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>Repartition des roles</div>
+              <div style={{ width: "100%", height: 280 }}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={pieChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
+                      {pieChartData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {section === 'users' && (
-        <div className="card shadow-sm">
-          <div className="card-body">
-            <h2 className="h4 mb-2">Gestion utilisateurs</h2>
-            <h5 className="text-muted mb-4">Liste, recherche et suivi des comptes</h5>
-
-            <div className="list-group mb-4">
-              <Link to="/create_medecin" className="bg-primary list-group-item list-group-item-action text-white">
-                Creer un medecin
-              </Link>
-
-            </div>
-
-            <DataTable columns={columns} data={users} pagination />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 16 }}>
+            <div style={{ background: "#FEF9E7", padding: "10px 12px", borderRadius: 10 }}>Admins: {chartData.adminsPercent}%</div>
+            <div style={{ background: "#EAFAF1", padding: "10px 12px", borderRadius: 10 }}>Medecins: {chartData.medecinsPercent}%</div>
+            <div style={{ background: "#EBF5FB", padding: "10px 12px", borderRadius: 10 }}>Actifs 30j: {chartData.actifsPercent}%</div>
           </div>
-        </div>
+        </Card>
       )}
-  </>
-);
+
+      {section === "users" && (
+        <Card>
+          <SectionTitle sub="Liste, recherche et suivi des comptes">Gestion utilisateurs</SectionTitle>
+          <DataTable columns={columns} data={users} pagination customStyles={tableStyles} />
+        </Card>
+      )}
+    </div>
+  );
 }
