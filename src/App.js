@@ -6,6 +6,7 @@ import CreateMedecin from './components/create_medecin';
 import Espaceadmin from './components/Espaceadmin';
 import RegisterPatient from './components/RegisterPatient';
 import PatientSpace from './components/PatientSpace';
+import DoctorSpace from './components/DoctorSpace';
 
 // Main application router
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/espace-admin" element={<Espaceadmin />} /> 
         <Route path="/register" element={<RegisterPatient />} />
         <Route path="/patient_space" element={<PatientSpace />} />
+        <Route path="/espacemedecin" element={<DoctorSpace />} />
       </Routes>
     </div>
   );
