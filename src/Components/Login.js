@@ -1,12 +1,8 @@
 import logo from '../favicon.ico'; 
-
-import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css'; 
-import { useEffect, useState } from 'react'; 
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react'; 
 import Swal from 'sweetalert2';
 import axios from 'axios'; 
-import { useNavigate } from 'react-router-dom';
-const token = localStorage.getItem('token'); 
 
 export default function Login() { 
     const navigate = useNavigate();
@@ -18,31 +14,40 @@ export default function Login() {
     }
     const handleSubmit = (event) => {
         event.preventDefault();  
-        form.email = form.email.trim();
-        form.password = form.password.trim();
-        axios.post('http://localhost:5000/api/login', form)
+        
+        // Validate FIRST before making API call
+        const email = form.email.trim();
+        const password = form.password.trim();
+        
+        if (!email || !password) {
+            Swal.fire('Error', 'Please fill in both email and password fields.', 'error');
+            return;
+        }
+        
+        if (!email.includes('@') || !email.includes('.')) {
+            Swal.fire('Error', 'Please enter a valid email address.', 'error');
+            return;
+        }
+        
+        axios.post('http://localhost:5000/api/login', { email, password, role: form.role })
             .then(response => {
                 console.log(response.data);
                 Swal.fire('Success', 'Login successful!', 'success'); 
                 localStorage.setItem('token', response.data.token);
+                setForm({email: '', password: '', role: 'medecin'});
+                
                 if (response.data.role === 'admin') {
                     navigate('/espace-admin');
                 } else if (response.data.role === 'medecin') {
                     navigate('/espacemedecin');
                 } else if (response.data.role === 'patient') {
-                    navigate('/espacepatient');
+                    navigate('/patient_space');
                 }
             })
             .catch(error => {
                 console.error(error);
                 Swal.fire('Error', error.response?.data?.message || 'An error occurred', 'error');
             });
-        if ( form.email.trim() === '' || form.password.trim() === '') {
-            Swal.fire('Error', 'Please fill in both email and password fields.', 'error');
-            return;
-        } 
-        
-        setForm({email: '', password: '',});
     };
 
     return (
