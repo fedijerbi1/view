@@ -1,16 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
-const THEMES = {
-  primary: { accent: "#1E6FE3", surface: "#E7E5E4", text: "#1E2938" },
-  success: { accent: "#00A63D", surface: "#E7E5E4", text: "#1E2938" },
-  info: { accent: "#1E6FE3", surface: "#E7E5E4", text: "#1E2938" },
-};
-
-const SHADOWS = {
-  card: "8px 8px 16px #c4c3c2, -8px -8px 16px #ffffff",
-  inset: "inset 4px 4px 8px #c4c3c2, inset -4px -4px 8px #ffffff",
-};
+import { C, THEMES, SHADOWS } from "../theme/unifiedTheme";
 
 export default function SideBar({ title, subtitle, items, accent = "primary" }) {
   const navigate = useNavigate();

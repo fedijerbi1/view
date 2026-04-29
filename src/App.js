@@ -1,4 +1,9 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import './styles/global.css';
+import './styles/light-theme.css';
+import './styles/components.css';
+import './styles/dashboard-pages.css';
+import './styles/sidebar.css';
 import './App.css';
 import Login from './components/Login';
 import CreateMedecin from './components/create_medecin'; 

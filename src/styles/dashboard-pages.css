@@ -1,0 +1,361 @@
+/**
+ * Specialized Dashboard Pages Styles
+ * EspacePatient, Espaceadmin, EspaceMedecin
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* PATIENT DASHBOARD SECTIONS */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.patient-vitals-section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.patient-vital-card {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.patient-vital-card:hover {
+  border-color: var(--color-border-light);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.patient-vital-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.patient-vital-value {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: var(--space-1);
+}
+
+.patient-vital-unit {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+.patient-vital-status {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+  margin-top: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  font-weight: 600;
+}
+
+.patient-vital-status.normal {
+  color: var(--color-success);
+}
+
+.patient-vital-status.warning {
+  color: var(--color-warning);
+}
+
+.patient-vital-status.danger {
+  color: var(--color-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* BIOMETRICS & DATA SECTIONS */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.biometrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.biometric-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.biometric-item-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-mid);
+  margin-bottom: var(--space-2);
+}
+
+.biometric-item-value {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* HISTORY SECTION */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.history-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-8);
+}
+
+.history-header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+}
+
+.history-header-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table thead {
+  background: var(--color-surface-alt);
+}
+
+.history-table th {
+  padding: var(--space-3);
+  text-align: left;
+  color: var(--color-text-mid);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  border-bottom: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.history-table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.history-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.history-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* ADMIN DASHBOARD */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-dashboard-header {
+  margin-bottom: var(--space-8);
+}
+
+.admin-dashboard-title {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.admin-dashboard-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-mid);
+  margin: 0;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.admin-stat {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition: all var(--transition-base);
+}
+
+.admin-stat:hover {
+  border-color: var(--color-border-light);
+  box-shadow: var(--shadow-hover);
+}
+
+.admin-stat-number {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+
+.admin-stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-mid);
+  margin: 0;
+}
+
+.admin-chart-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-8);
+  height: 300px;
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.admin-users-table thead {
+  background: var(--color-surface-alt);
+}
+
+.admin-users-table th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  color: var(--color-text-mid);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  border-bottom: 1px solid var(--color-border);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-users-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.admin-users-table tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.admin-users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* MEDECIN DASHBOARD */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+.medecin-dashboard-header {
+  margin-bottom: var(--space-8);
+}
+
+.medecin-dashboard-title {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.medecin-patients-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.medecin-patient-card {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.medecin-patient-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.medecin-patient-name {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.medecin-patient-info {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  margin: var(--space-1) 0;
+}
+
+.medecin-patient-status {
+  display: inline-block;
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+  margin-top: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* RESPONSIVE */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .patient-vitals-section,
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .biometrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-vitals-section,
+  .admin-stats-grid,
+  .biometrics-grid,
+  .medecin-patients-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .patient-vital-card,
+  .admin-stat {
+    padding: var(--space-3);
+  }
+
+  .patient-vital-value {
+    font-size: var(--font-size-lg);
+  }
+}

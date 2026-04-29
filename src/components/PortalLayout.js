@@ -1,22 +1,9 @@
 import SideBar from "./SideBar";
-
-const ACCENTS = {
-  primary: "#1E6FE3",
-  info: "#1E6FE3",
-  success: "#00A63D",
-};
-
-const C = {
-  primary: "#1E6FE3",
-  secondary: "#F1F2F5",
-  surface: "#E7E5E4",
-  text: "#1E2938",
-  textMuted: "#64748B",
-  cardShadow: "8px 8px 16px #c4c3c2, -8px -8px 16px #ffffff",
-};
+import { C, ACCENTS } from "../theme/unifiedTheme";
+import './PortalLayout.css';
 
 export default function PortalLayout({ title, subtitle, items, accent = "primary", children }) {
-  const accentColor = ACCENTS[accent] || accent || "#2E86C1";
+  const accentColor = ACCENTS[accent] || accent || "#0c5cab";
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: C.secondary }}>
       <SideBar title={title} subtitle={subtitle} items={items} accent={accent} />

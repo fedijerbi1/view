@@ -3,15 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
-
-const C = {
-  primary: "#1E6FE3",
-  surface: "#E7E5E4",
-  text: "#1E2938",
-  textMuted: "#64748B",
-  cardShadow: "8px 8px 16px #c4c3c2, -8px -8px 16px #ffffff",
-  insetShadow: "inset 4px 4px 8px #c4c3c2, inset -4px -4px 8px #ffffff",
-};
+import { C } from '../theme/unifiedTheme';
+import './ForgotPassword.css';
 
 export default function ForgotPassword() {
   const navigate = useNavigate();

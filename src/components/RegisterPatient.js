@@ -4,15 +4,8 @@ import Swal from 'sweetalert2';
 import {useNavigate} from 'react-router-dom';
 
 import { Link } from 'react-router-dom';
-
-const C = {
-  primary: "#1E6FE3",
-  surface: "#E7E5E4",
-  text: "#1E2938",
-  textMuted: "#64748B",
-  cardShadow: "8px 8px 16px #c4c3c2, -8px -8px 16px #ffffff",
-  insetShadow: "inset 4px 4px 8px #c4c3c2, inset -4px -4px 8px #ffffff",
-};
+import { C } from '../theme/unifiedTheme';
+import './RegisterPatient.css';
 
 function RegisterPatient() { 
   const navigate = useNavigate(); 

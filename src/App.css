@@ -1,58 +1,90 @@
+/**
+ * App Global Styles - Updated to use Dashboard Design System
+ */
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  background: white;
+  color: #1f2937;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Legacy styles cleanup - Now using global.css classes */
 
 .auth-shell {
   min-height: 100vh;
-  background: radial-gradient(circle at top left, #f7f2ff 0%, #f0f7ff 35%, #fef6ec 100%);
+  background: white;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .auth-card {
   border: none;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  background: #ffffff;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: var(--shadow-modal);
 }
 
+.auth-card-body {
+  padding: var(--space-8);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* Cleanup old gradients - use new color system */
+.auth-input {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-inset);
+}
+
+.auth-input:focus {
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.auth-button {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-6);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-card);
+}
+
+.auth-button:hover {
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.auth-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .auth-card {
+    max-width: 90vw;
+  }
+
+  .auth-card-body {
+    padding: var(--space-6);
+  }
+}
+
+
+
 .auth-side {
-  background: linear-gradient(145deg, #1f6feb 0%, #22c1c3 55%, #fdbb2d 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   position: relative;
 }
 
@@ -60,7 +92,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.25), transparent 60%);
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1), transparent 60%);
 }
 
 .auth-side > div {
@@ -95,8 +127,8 @@
 
 .neu-sidebar {
   width: 260px;
-  background: var(--nav-surface);
-  color: var(--nav-text);
+  background: var(--color-surface);
+  color: var(--color-text);
   padding: 26px 18px;
   display: flex;
   flex-direction: column;
@@ -104,7 +136,8 @@
   position: sticky;
   top: 0;
   height: 100vh;
-  box-shadow: var(--nav-shadow);
+  box-shadow: var(--shadow-card);
+  border-right: 1px solid var(--color-border);
 }
 
 .neu-sidebar__header {
@@ -117,32 +150,35 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: var(--nav-surface);
+  background: var(--color-surface-alt);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--nav-accent);
+  color: var(--color-primary);
   font-weight: 700;
-  box-shadow: var(--nav-inset);
+  box-shadow: var(--shadow-inset);
 }
 
 .neu-sidebar__title {
   font-weight: 700;
   font-size: 16px;
+  color: var(--color-text);
 }
 
 .neu-sidebar__subtitle {
   font-size: 11px;
   opacity: 0.7;
+  color: var(--color-text-mid);
 }
 
 .neu-sidebar__tag {
-  background: var(--nav-surface);
+  background: var(--color-surface-alt);
   border-radius: 12px;
   padding: 10px 12px;
   font-size: 12px;
-  color: var(--nav-text);
-  box-shadow: var(--nav-inset);
+  color: var(--color-text-mid);
+  box-shadow: var(--shadow-inset);
+  border: 1px solid var(--color-border);
 }
 
 .neu-sidebar__nav {
@@ -156,7 +192,7 @@
 
 .neu-nav-link {
   text-decoration: none;
-  color: var(--nav-text);
+  color: var(--color-text-mid);
   background: transparent;
   padding: 10px 12px;
   border-radius: 12px;
@@ -164,7 +200,10 @@
   align-items: center;
   gap: 10px;
   font-weight: 500;
-  transition: box-shadow 0.2s ease, color 0.2s ease;
+  transition: all var(--transition-base);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .neu-nav-link__icon {
@@ -172,43 +211,48 @@
 }
 
 .neu-nav-link:hover {
-  color: var(--nav-accent);
-  background: var(--nav-surface);
-  box-shadow: var(--nav-shadow);
+  color: var(--color-primary);
+  background: var(--color-surface-alt);
+  box-shadow: var(--shadow-card);
 }
 
 .neu-nav-link:focus-visible {
-  outline: 2px solid var(--nav-accent);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
-  background: var(--nav-surface);
-  box-shadow: var(--nav-shadow);
+  background: var(--color-surface-alt);
+  box-shadow: var(--shadow-card);
 }
 
 .neu-nav-link.is-active {
-  color: var(--nav-accent);
-  background: var(--nav-surface);
+  color: var(--color-primary);
+  background: var(--color-surface-alt);
   font-weight: 700;
-  box-shadow: var(--nav-inset);
+  box-shadow: var(--shadow-inset);
+  border-left: 3px solid var(--color-primary);
+  padding-left: calc(12px - 3px);
 }
 
 .neu-logout {
-  background: var(--nav-surface);
-  border: none;
-  color: var(--nav-text);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-mid);
   padding: 10px 12px;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: var(--nav-shadow);
-  transition: box-shadow 0.2s ease, color 0.2s ease;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-base);
+  font-family: inherit;
 }
 
 .neu-logout:hover {
-  color: var(--nav-accent);
-  box-shadow: var(--nav-inset);
+  color: var(--color-danger);
+  background: var(--color-surface);
+  border-color: var(--color-danger);
+  box-shadow: var(--shadow-hover);
 }
 
 .neu-logout:focus-visible {
-  outline: 2px solid var(--nav-accent);
+  outline: 2px solid var(--color-danger);
   outline-offset: 2px;
 }

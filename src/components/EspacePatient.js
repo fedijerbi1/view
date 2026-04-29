@@ -2,28 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
-// ─── Color Tokens ───────────────────────────────────────────────────────────
-const C = {
-  bg: "#F1F2F5",
-  surface: "#E7E5E4",
-  surfaceAlt: "#F1F2F5",
-  primary: "#1E6FE3",
-  primaryLight: "#DCE9FF",
-  primaryDark: "#0B4DB8",
-  accent: "#00A63D",
-  accentLight: "#D7F5E2",
-  warning: "#FE9900",
-  danger: "#FF2157",
-  dangerLight: "#FFD6E0",
-  text: "#1E2938",
-  textMid: "#475569",
-  textLight: "#94A3B8",
-  border: "rgba(30,41,56,0.12)",
-  borderMid: "rgba(30,41,56,0.2)",
-  cardShadow: "8px 8px 16px rgba(30,41,56,0.12), -8px -8px 16px rgba(255,255,255,0.8)",
-  insetShadow: "inset 6px 6px 12px rgba(30,41,56,0.12), inset -6px -6px 12px rgba(255,255,255,0.7)",
-};
+import { C } from "../theme/unifiedTheme";
 
 const API_BASE = "http://localhost:5000/api";
 
@@ -49,10 +28,10 @@ const toDateTimeLabel = (dateValue) => {
 
 function Badge({ color, children }) {
   const colors = {
-    success: { bg: "#EAFAF1", text: "#1E8449" },
-    warning: { bg: "#FEF9E7", text: "#B7770D" },
-    danger: { bg: "#FDEDEC", text: "#A93226" },
-    info: { bg: "#EBF5FB", text: "#1A5276" },
+    success: { bg: "#d1fae5", text: "#065f46" },
+    warning: { bg: "#fef3c7", text: "#92400e" },
+    danger: { bg: "#fee2e2", text: "#7f1d1d" },
+    info: { bg: "#dbeafe", text: "#1e40af" },
   };
   const c = colors[color] || colors.info;
   return (
@@ -179,7 +158,7 @@ function FormField({ label, type = "number", value, onChange, unit, min, max, st
       <label style={{ fontSize: 13, fontWeight: 600, color: C.textMid, display: "block", marginBottom: 5 }}>{label}</label>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <input type={type} value={value} onChange={e => onChange(e.target.value)} min={min} max={max} step={step}
-          style={{ flex: 1, padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, outline: "none", boxShadow: C.insetShadow }} />
+          style={{ flex: 1, padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt, outline: "none", boxShadow: C.insetShadow }} />
         {unit && <span style={{ fontSize: 13, color: C.textLight, whiteSpace: "nowrap" }}>{unit}</span>}
       </div>
     </div>
@@ -633,7 +612,7 @@ function NutritionPage({ nutri, setNutri }) {
           <div style={{ marginBottom: 14 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: C.textMid, display: "block", marginBottom: 5 }}>Qualité nutritionnelle</label>
             <select value={form.qualite} onChange={e => setForm(f => ({ ...f, qualite: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, boxShadow: C.insetShadow }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               {["Excellente", "Bonne", "Moyenne", "Mauvaise"].map(q => <option key={q}>{q}</option>)}
             </select>
           </div>
@@ -838,7 +817,7 @@ function GoalsPage({ goals, setGoals }) {
               const presets = { "Pas quotidiens": { unite: "pas", icon: "🦶" }, "Eau": { unite: "L", icon: "💧" }, "Sommeil": { unite: "h", icon: "🌙" }, "Calories brûlées": { unite: "kcal", icon: "🔥" }, "Poids": { unite: "kg", icon: "⚖️" } };
               const p = presets[e.target.value] || {};
               setForm(f => ({ ...f, type: e.target.value, ...p }));
-            }} style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, boxShadow: C.insetShadow }}>
+            }} style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               <option value="">Sélectionner...</option>
               {["Pas quotidiens", "Eau", "Sommeil", "Calories brûlées", "Poids"].map(t => <option key={t}>{t}</option>)}
             </select>
@@ -847,7 +826,7 @@ function GoalsPage({ goals, setGoals }) {
           <div style={{ marginBottom: 14 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: C.textMid, display: "block", marginBottom: 5 }}>Période</label>
             <select value={form.periode} onChange={e => setForm(f => ({ ...f, periode: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, boxShadow: C.insetShadow }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               <option>Quotidien</option><option>Hebdomadaire</option>
             </select>
           </div>
@@ -925,7 +904,7 @@ function MessagesPage({ messages, messageForm, setMessageForm, onSend, hasMedeci
           onChange={(e) => setMessageForm((prev) => ({ ...prev, subject: e.target.value }))}
           placeholder="Objet"
           disabled={!hasMedecin}
-          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surfaceAlt, boxShadow: C.insetShadow }}
         />
         <textarea
           value={messageForm.body}
@@ -933,7 +912,7 @@ function MessagesPage({ messages, messageForm, setMessageForm, onSend, hasMedeci
           placeholder="Ecrivez votre message..."
           rows={6}
           disabled={!hasMedecin}
-          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }}
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surfaceAlt, boxShadow: C.insetShadow }}
         />
         <button
           onClick={onSend}
@@ -993,6 +972,14 @@ export default function EspacePatient({ section = "dashboard" }) {
   const [messages, setMessages] = useState([]);
   const [messageForm, setMessageForm] = useState({ subject: "", body: "" });
   const [profile, setProfile] = useState(null);
+
+  const swalTheme = {
+    background: C.surface,
+    color: C.text,
+    confirmButtonColor: C.primary,
+    cancelButtonColor: C.border,
+    iconColor: C.primary,
+  };
 
   useEffect(() => {
     if (section && section !== page) {
@@ -1057,6 +1044,7 @@ export default function EspacePatient({ section = "dashboard" }) {
       showCancelButton: true,
       confirmButtonText: "Oui",
       cancelButtonText: "Annuler",
+      ...swalTheme,
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem("token");
@@ -1094,11 +1082,11 @@ export default function EspacePatient({ section = "dashboard" }) {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Space Mono', 'Segoe UI', monospace", background: C.bg, color: C.text }}>
-      <aside style={{ width: 240, background: C.surface, display: "flex", flexDirection: "column", boxShadow: C.cardShadow, flexShrink: 0 }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: C.fontFamily, background: C.surface, color: C.text }}>
+      <aside style={{ width: 240, background: C.surfaceAlt, display: "flex", flexDirection: "column", boxShadow: C.cardShadow, flexShrink: 0 }}>
         <div style={{ padding: "24px 20px 20px", borderBottom: `1px solid ${C.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 10, background: C.surface, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: C.insetShadow }}>
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: C.primaryLight, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: C.cardShadow }}>
               <span style={{ fontSize: 20 }}>🏥</span>
             </div>
             <div>
@@ -1125,7 +1113,7 @@ export default function EspacePatient({ section = "dashboard" }) {
             const active = page === item.key;
             return (
               <button key={item.key} onClick={() => setPage(item.key)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", marginBottom: 3, borderRadius: 10, border: "none", background: active ? C.surface : "transparent", color: active ? C.primary : C.textMid, cursor: "pointer", textAlign: "left", fontWeight: active ? 700 : 500, fontSize: 14, transition: "all 0.15s", boxShadow: active ? C.insetShadow : "none" }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", marginBottom: 3, borderRadius: 10, border: "none", background: active ? C.primary : "transparent", color: active ? "white" : C.textMid, cursor: "pointer", textAlign: "left", fontWeight: active ? 700 : 500, fontSize: 14, transition: "all 0.15s" }}>
                 <span style={{ fontSize: 17 }}>{item.icon}</span>
                 {item.label}
               </button>
@@ -1138,7 +1126,7 @@ export default function EspacePatient({ section = "dashboard" }) {
           <div style={{ fontSize: 12, color: C.textMid, marginBottom: 12 }}>
             {hasMedecin ? `Suivi par ${medecinName}` : "Aucun medecin attribue"}
           </div>
-          <button onClick={handleLogout} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, color: C.text, fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
+          <button onClick={handleLogout} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.danger, color: "white", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
             Deconnexion
           </button>
         </div>
@@ -1160,7 +1148,7 @@ export default function EspacePatient({ section = "dashboard" }) {
 
         <div style={{ padding: "28px 32px", maxWidth: 1100, margin: "0 auto" }}>
           {!hasMedecin && (
-            <div style={{ background: "#FEF9E7", border: "1px solid #F9E79F", borderRadius: 12, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#7D6608" }}>
+            <div style={{ background: "#fef3c7", border: "1px solid #fcd34d", borderRadius: 12, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#92400e" }}>
               Votre compte n'est pas encore attribue a un medecin. Merci de contacter l'administration.
             </div>
           )}

@@ -1,26 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-
-const C = {
-  bg: "#F1F2F5",
-  surface: "#E7E5E4",
-  surfaceAlt: "#F1F2F5",
-  primary: "#1E6FE3",
-  primaryLight: "#DCE9FF",
-  primaryDark: "#0B4DB8",
-  accent: "#00A63D",
-  accentLight: "#D7F5E2",
-  warning: "#FE9900",
-  danger: "#FF2157",
-  dangerLight: "#FFD6E0",
-  text: "#1E2938",
-  textMid: "#475569",
-  textLight: "#94A3B8",
-  border: "rgba(30,41,56,0.12)",
-  borderMid: "rgba(30,41,56,0.2)",
-  cardShadow: "8px 8px 16px rgba(30,41,56,0.12), -8px -8px 16px rgba(255,255,255,0.8)",
-  insetShadow: "inset 6px 6px 12px rgba(30,41,56,0.12), inset -6px -6px 12px rgba(255,255,255,0.7)",
-};
+import Swal from "sweetalert2";
+import { C } from "../theme/unifiedTheme";
 
 const API_BASE = "http://localhost:5000/api";
 
@@ -61,10 +42,10 @@ const riskColor = (risk) => {
 
 function Badge({ color, children }) {
   const colors = {
-    success: { bg: "#EAFAF1", text: "#1E8449" },
-    warning: { bg: "#FEF9E7", text: "#B7770D" },
-    danger: { bg: "#FDEDEC", text: "#A93226" },
-    info: { bg: "#EBF5FB", text: "#1A5276" },
+    success: { bg: "#d1fae5", text: "#065f46" },
+    warning: { bg: "#fef3c7", text: "#92400e" },
+    danger: { bg: "#fee2e2", text: "#7f1d1d" },
+    info: { bg: "#dbeafe", text: "#1e40af" },
   };
   const c = colors[color] || colors.info;
   return (
@@ -131,6 +112,13 @@ export default function EspaceMedecin({ section = "dashboard" }) {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const swalTheme = {
+    background: C.surface,
+    color: C.text,
+    confirmButtonColor: C.primary,
+    iconColor: C.primary,
+  };
+
   const [prescriptionForm, setPrescriptionForm] = useState({ patientId: "", medicine: "", dosage: "", duration: "", notes: "" });
   const [messageForm, setMessageForm] = useState({ patientId: "", subject: "", body: "" });
   const [reportForm, setReportForm] = useState({ patientId: "", period: "Hebdomadaire", focus: "Cardio", summary: "" });
@@ -163,6 +151,13 @@ export default function EspaceMedecin({ section = "dashboard" }) {
           setMessageForm((prev) => ({ ...prev, patientId: firstId }));
           setReportForm((prev) => ({ ...prev, patientId: firstId }));
         }
+      } catch (error) {
+        Swal.fire({
+          title: "Erreur",
+          text: "Impossible de charger les donnees medecin.",
+          icon: "error",
+          ...swalTheme,
+        });
       } finally {
         setLoading(false);
       }
@@ -198,10 +193,33 @@ export default function EspaceMedecin({ section = "dashboard" }) {
   ];
 
   const handlePrescriptionSubmit = async () => {
-    if (!prescriptionForm.patientId || !prescriptionForm.medicine) return;
-    const response = await axios.post(`${API_BASE}/medecin/prescriptions`, prescriptionForm, { headers });
-    setPrescriptions((current) => [response.data, ...current]);
-    setPrescriptionForm((prev) => ({ ...prev, medicine: "", dosage: "", duration: "", notes: "" }));
+    if (!prescriptionForm.patientId || !prescriptionForm.medicine) {
+      await Swal.fire({
+        title: "Champs requis",
+        text: "Veuillez choisir un patient et un medicament.",
+        icon: "warning",
+        ...swalTheme,
+      });
+      return;
+    }
+    try {
+      const response = await axios.post(`${API_BASE}/medecin/prescriptions`, prescriptionForm, { headers });
+      setPrescriptions((current) => [response.data, ...current]);
+      setPrescriptionForm((prev) => ({ ...prev, medicine: "", dosage: "", duration: "", notes: "" }));
+      await Swal.fire({
+        title: "Prescription ajoutee",
+        text: "La prescription a ete enregistree.",
+        icon: "success",
+        ...swalTheme,
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Erreur",
+        text: "Impossible d'enregistrer la prescription.",
+        icon: "error",
+        ...swalTheme,
+      });
+    }
   };
 
   const handleSelectPatient = (patientId) => {
@@ -212,17 +230,63 @@ export default function EspaceMedecin({ section = "dashboard" }) {
   };
 
   const handleMessageSubmit = async () => {
-    if (!messageForm.patientId || !messageForm.subject || !messageForm.body) return;
-    const response = await axios.post(`${API_BASE}/medecin/messages`, messageForm, { headers });
-    setMessages((current) => [response.data, ...current]);
-    setMessageForm((prev) => ({ ...prev, subject: "", body: "" }));
+    if (!messageForm.patientId || !messageForm.subject || !messageForm.body) {
+      await Swal.fire({
+        title: "Champs requis",
+        text: "Veuillez saisir un objet et un message.",
+        icon: "warning",
+        ...swalTheme,
+      });
+      return;
+    }
+    try {
+      const response = await axios.post(`${API_BASE}/medecin/messages`, messageForm, { headers });
+      setMessages((current) => [response.data, ...current]);
+      setMessageForm((prev) => ({ ...prev, subject: "", body: "" }));
+      await Swal.fire({
+        title: "Message envoye",
+        text: "Le message a ete transmis au patient.",
+        icon: "success",
+        ...swalTheme,
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Erreur",
+        text: "Impossible d'envoyer le message.",
+        icon: "error",
+        ...swalTheme,
+      });
+    }
   };
 
   const handleReportSubmit = async () => {
-    if (!reportForm.period || !reportForm.focus) return;
-    const response = await axios.post(`${API_BASE}/medecin/reports`, reportForm, { headers });
-    setReports((current) => [response.data, ...current]);
-    setReportForm((prev) => ({ ...prev, summary: "" }));
+    if (!reportForm.period || !reportForm.focus) {
+      await Swal.fire({
+        title: "Champs requis",
+        text: "Veuillez choisir une periode et un focus.",
+        icon: "warning",
+        ...swalTheme,
+      });
+      return;
+    }
+    try {
+      const response = await axios.post(`${API_BASE}/medecin/reports`, reportForm, { headers });
+      setReports((current) => [response.data, ...current]);
+      setReportForm((prev) => ({ ...prev, summary: "" }));
+      await Swal.fire({
+        title: "Rapport genere",
+        text: "Le rapport a ete ajoute a l'historique.",
+        icon: "success",
+        ...swalTheme,
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Erreur",
+        text: "Impossible de generer le rapport.",
+        icon: "error",
+        ...swalTheme,
+      });
+    }
   };
 
   return (
@@ -439,15 +503,15 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             <SectionTitle sub="Nouveau message">Messagerie patient</SectionTitle>
             <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
             <select value={messageForm.patientId} onChange={(e) => setMessageForm((prev) => ({ ...prev, patientId: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               {patientOptions.map((p) => (
                 <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
               ))}
             </select>
             <input value={messageForm.subject} onChange={(e) => setMessageForm((prev) => ({ ...prev, subject: e.target.value }))}
-              placeholder="Objet" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }} />
+              placeholder="Objet" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surfaceAlt, boxShadow: C.insetShadow }} />
             <textarea value={messageForm.body} onChange={(e) => setMessageForm((prev) => ({ ...prev, body: e.target.value }))}
-              placeholder="Contenu du message" rows={6} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
+              placeholder="Contenu du message" rows={6} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surfaceAlt, boxShadow: C.insetShadow }} />
             <button onClick={handleMessageSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
               Envoyer
             </button>
@@ -477,7 +541,7 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             <SectionTitle sub="Generer un rapport">Synthese medicale</SectionTitle>
             <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
             <select value={reportForm.patientId} onChange={(e) => setReportForm((prev) => ({ ...prev, patientId: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               <option value="">Tous les patients</option>
               {patientOptions.map((p) => (
                 <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
@@ -485,20 +549,20 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             </select>
             <label style={{ fontSize: 12, color: C.textLight }}>Periode</label>
             <select value={reportForm.period} onChange={(e) => setReportForm((prev) => ({ ...prev, period: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               {"Hebdomadaire Mensuel Trimestriel".split(" ").map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
             <label style={{ fontSize: 12, color: C.textLight }}>Focus</label>
             <select value={reportForm.focus} onChange={(e) => setReportForm((prev) => ({ ...prev, focus: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surfaceAlt, boxShadow: C.insetShadow }}>
               {"Cardio Diabete Respiratoire".split(" ").map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
             <textarea value={reportForm.summary} onChange={(e) => setReportForm((prev) => ({ ...prev, summary: e.target.value }))}
-              placeholder="Notes de synthese" rows={4} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
+              placeholder="Notes de synthese" rows={4} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surfaceAlt, boxShadow: C.insetShadow }} />
             <button onClick={handleReportSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
               Generer le rapport
             </button>

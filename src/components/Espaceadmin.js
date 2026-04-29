@@ -4,25 +4,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import DataTable from "react-data-table-component";
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-
-const C = {
-  bg: "#F1F2F5",
-  surface: "#E7E5E4",
-  surfaceAlt: "#F1F2F5",
-  primary: "#1E6FE3",
-  primaryLight: "#DCE9FF",
-  primaryDark: "#0B4DB8",
-  accent: "#00A63D",
-  warning: "#FE9900",
-  danger: "#FF2157",
-  text: "#1E2938",
-  textMid: "#475569",
-  textLight: "#94A3B8",
-  border: "rgba(30,41,56,0.12)",
-  borderMid: "rgba(30,41,56,0.2)",
-  cardShadow: "8px 8px 16px rgba(30,41,56,0.12), -8px -8px 16px rgba(255,255,255,0.8)",
-  insetShadow: "inset 6px 6px 12px rgba(30,41,56,0.12), inset -6px -6px 12px rgba(255,255,255,0.7)",
-};
+import { C } from "../theme/unifiedTheme";
 
 const columns = [
   { name: "ID", selector: row => row.id, sortable: true },
@@ -71,6 +53,13 @@ export default function Espaceadmin({ section = "dashboard" }) {
     new_this_month: 0,
   });
 
+  const swalTheme = {
+    background: C.surface,
+    color: C.text,
+    confirmButtonColor: C.primary,
+    iconColor: C.primary,
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -92,7 +81,12 @@ export default function Espaceadmin({ section = "dashboard" }) {
         setUsers(usersResponse.data || []);
         setStats(statsResponse.data || {});
       } catch (error) {
-        Swal.fire("Erreur", "Erreur lors de la recuperation des donnees", "error");
+        Swal.fire({
+          title: "Erreur",
+          text: "Erreur lors de la recuperation des donnees",
+          icon: "error",
+          ...swalTheme,
+        });
       }
     };
 
@@ -208,9 +202,9 @@ export default function Espaceadmin({ section = "dashboard" }) {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 16 }}>
-            <div style={{ background: C.surface, padding: "10px 12px", borderRadius: 10, boxShadow: C.insetShadow }}>Admins: {chartData.adminsPercent}%</div>
-            <div style={{ background: C.surface, padding: "10px 12px", borderRadius: 10, boxShadow: C.insetShadow }}>Medecins: {chartData.medecinsPercent}%</div>
-            <div style={{ background: C.surface, padding: "10px 12px", borderRadius: 10, boxShadow: C.insetShadow }}>Actifs 30j: {chartData.actifsPercent}%</div>
+            <div style={{ background: C.surfaceAlt, padding: "10px 12px", borderRadius: 10, boxShadow: C.cardShadow }}>Admins: {chartData.adminsPercent}%</div>
+            <div style={{ background: C.surfaceAlt, padding: "10px 12px", borderRadius: 10, boxShadow: C.cardShadow }}>Medecins: {chartData.medecinsPercent}%</div>
+            <div style={{ background: C.surfaceAlt, padding: "10px 12px", borderRadius: 10, boxShadow: C.cardShadow }}>Actifs 30j: {chartData.actifsPercent}%</div>
           </div>
         </Card>
       )}

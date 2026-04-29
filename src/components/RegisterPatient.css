@@ -1,0 +1,231 @@
+/**
+ * RegisterPatient Component Styles
+ * Updated to use Dashboard Design System
+ */
+
+.register-patient-shell {
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.register-patient-card {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.register-patient-side {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-primary) 100%);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  box-shadow: var(--shadow-inset);
+}
+
+.register-patient-side h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+.register-patient-side p {
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+
+.register-patient-body {
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.register-patient-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.register-patient-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-mid);
+  margin-bottom: var(--space-6);
+}
+
+.register-patient-form-group {
+  margin-bottom: var(--space-4);
+}
+
+.register-patient-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.register-patient-form-row.full {
+  grid-template-columns: 1fr;
+}
+
+.register-patient-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-mid);
+  margin-bottom: var(--space-2);
+}
+
+.register-patient-input,
+.register-patient-select {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  box-shadow: var(--shadow-inset);
+  outline: none;
+  transition: all var(--transition-base);
+  font-family: inherit;
+}
+
+.register-patient-input:focus,
+.register-patient-select:focus {
+  box-shadow: var(--shadow-focus);
+  background: var(--color-surface-hover);
+}
+
+.register-patient-input::placeholder {
+  color: var(--color-text-light);
+}
+
+.register-patient-input.error {
+  border: 1px solid var(--color-danger);
+}
+
+.register-patient-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  margin-top: var(--space-1);
+}
+
+.register-patient-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+  font-size: var(--font-size-sm);
+}
+
+.register-patient-checkbox-group input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+}
+
+.register-patient-checkbox-group label {
+  cursor: pointer;
+  flex: 1;
+}
+
+.register-patient-button {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-success);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-card);
+  min-height: var(--touch-target);
+  margin-top: var(--space-4);
+}
+
+.register-patient-button:hover {
+  background: var(--color-success-dark);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.register-patient-button:active {
+  transform: translateY(0);
+}
+
+.register-patient-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.register-patient-footer {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-mid);
+  margin-top: var(--space-4);
+}
+
+.register-patient-footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-base);
+}
+
+.register-patient-footer a:hover {
+  color: var(--color-primary-light);
+}
+
+@media (max-width: 768px) {
+  .register-patient-card {
+    grid-template-columns: 1fr;
+  }
+
+  .register-patient-side {
+    display: none;
+  }
+
+  .register-patient-body {
+    padding: var(--space-6);
+  }
+
+  .register-patient-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-patient-shell {
+    padding: var(--space-3);
+  }
+
+  .register-patient-body {
+    padding: var(--space-4);
+  }
+
+  .register-patient-title {
+    font-size: var(--font-size-md);
+  }
+}
