@@ -5,6 +5,15 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 
+const C = {
+    primary: "#1E6FE3",
+    surface: "#E7E5E4",
+    text: "#1E2938",
+    textMuted: "#64748B",
+    cardShadow: "8px 8px 16px #c4c3c2, -8px -8px 16px #ffffff",
+    insetShadow: "inset 4px 4px 8px #c4c3c2, inset -4px -4px 8px #ffffff",
+};
+
 export default function ChangePassword() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -222,21 +231,21 @@ export default function ChangePassword() {
                                     </div>
 
                                     {/* Règles du mot de passe */}
-                                    <div className='mb-3 p-3 bg-light rounded'>
-                                        <small className='text-muted'>
+                                    <div className='mb-4 p-4 rounded' style={{backgroundColor: C.surface, boxShadow: C.insetShadow}}>
+                                        <small style={{color: C.text}}>
                                             <strong>Le mot de passe doit contenir :</strong>
-                                            <ul className='mb-0 mt-1'>
-                                                <li className={form.newPassword.length >= 8 ? 'text-success' : ''}>
-                                                    Au moins 8 caractères {form.newPassword.length >= 8 ? '✓' : ''}
+                                            <ul className='mb-0 mt-2 p-0' style={{listStyleType: "none"}}>
+                                                <li className={form.newPassword.length >= 8 ? 'text-success' : 'text-muted'}>
+                                                    {form.newPassword.length >= 8 ? '✓' : '○'} Au moins 8 caractères
                                                 </li>
-                                                <li className={/[A-Z]/.test(form.newPassword) ? 'text-success' : ''}>
-                                                    Une lettre majuscule {/[A-Z]/.test(form.newPassword) ? '✓' : ''}
+                                                <li className={/[A-Z]/.test(form.newPassword) ? 'text-success' : 'text-muted'}>
+                                                    {/[A-Z]/.test(form.newPassword) ? '✓' : '○'} Une lettre majuscule
                                                 </li>
-                                                <li className={/[0-9]/.test(form.newPassword) ? 'text-success' : ''}>
-                                                    Un chiffre {/[0-9]/.test(form.newPassword) ? '✓' : ''}
+                                                <li className={/[0-9]/.test(form.newPassword) ? 'text-success' : 'text-muted'}>
+                                                    {/[0-9]/.test(form.newPassword) ? '✓' : '○'} Un chiffre
                                                 </li>
-                                                <li className={/[^A-Za-z0-9]/.test(form.newPassword) ? 'text-success' : ''}>
-                                                    Un caractère spécial (!@#$...) {/[^A-Za-z0-9]/.test(form.newPassword) ? '✓' : ''}
+                                                <li className={/[^A-Za-z0-9]/.test(form.newPassword) ? 'text-success' : 'text-muted'}>
+                                                    {/[^A-Za-z0-9]/.test(form.newPassword) ? '✓' : '○'} Un caractère spécial (!@#$...)
                                                 </li>
                                             </ul>
                                         </small>
@@ -244,8 +253,12 @@ export default function ChangePassword() {
 
                                     <button
                                         type='submit'
-                                        className='btn btn-primary w-100'
+                                        className='btn w-100 mb-3'
                                         disabled={loading}
+                                        style={{backgroundColor: C.surface, color: C.primary, boxShadow: C.cardShadow, fontWeight: "bold", padding: "12px 20px", borderRadius: "10px", border: "none"}}
+                                        onMouseDown={(e)=>e.currentTarget.style.boxShadow = C.insetShadow}
+                                        onMouseUp={(e)=>e.currentTarget.style.boxShadow = C.cardShadow}
+                                        onMouseLeave={(e)=>e.currentTarget.style.boxShadow = C.cardShadow}
                                     >
                                         {loading ? (
                                             <>
@@ -256,6 +269,12 @@ export default function ChangePassword() {
                                             'Confirmer le nouveau mot de passe'
                                         )}
                                     </button>
+                                    
+                                    <div className="text-center mt-3">
+                                        <Link to="/" style={{color: C.textMuted, fontWeight: "bold", textDecoration: "none"}}>
+                                            Retour
+                                        </Link>
+                                    </div>
 
                                 </form>
                             </div>

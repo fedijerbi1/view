@@ -6,21 +6,22 @@ import DataTable from "react-data-table-component";
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const C = {
-  bg: "#F0F7FF",
-  surface: "#FFFFFF",
-  surfaceAlt: "#F8FBFF",
-  primary: "#2E86C1",
-  primaryLight: "#AED6F1",
-  primaryDark: "#1A5276",
-  accent: "#27AE60",
-  warning: "#E67E22",
-  danger: "#E74C3C",
-  text: "#1B2631",
-  textMid: "#566573",
-  textLight: "#AEB6BF",
-  border: "#D6EAF8",
-  borderMid: "#A9CCE3",
-  cardShadow: "0 2px 12px rgba(46,134,193,0.08)",
+  bg: "#F1F2F5",
+  surface: "#E7E5E4",
+  surfaceAlt: "#F1F2F5",
+  primary: "#1E6FE3",
+  primaryLight: "#DCE9FF",
+  primaryDark: "#0B4DB8",
+  accent: "#00A63D",
+  warning: "#FE9900",
+  danger: "#FF2157",
+  text: "#1E2938",
+  textMid: "#475569",
+  textLight: "#94A3B8",
+  border: "rgba(30,41,56,0.12)",
+  borderMid: "rgba(30,41,56,0.2)",
+  cardShadow: "8px 8px 16px rgba(30,41,56,0.12), -8px -8px 16px rgba(255,255,255,0.8)",
+  insetShadow: "inset 6px 6px 12px rgba(30,41,56,0.12), inset -6px -6px 12px rgba(255,255,255,0.7)",
 };
 
 const columns = [
@@ -142,7 +143,7 @@ export default function Espaceadmin({ section = "dashboard" }) {
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: C.text }}>Espace Admin</h1>
           <p style={{ margin: "6px 0 0", color: C.textMid }}>Supervision des comptes et indicateurs globaux.</p>
         </div>
-        <Link to="/create_medecin" style={{ background: C.primary, color: "#fff", padding: "10px 16px", borderRadius: 12, textDecoration: "none", fontWeight: 600 }}>
+        <Link to="/create_medecin" style={{ background: C.primary, color: "#fff", padding: "10px 16px", borderRadius: 12, textDecoration: "none", fontWeight: 600, boxShadow: C.cardShadow }}>
           Creer un medecin
         </Link>
       </div>
@@ -207,9 +208,9 @@ export default function Espaceadmin({ section = "dashboard" }) {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 16 }}>
-            <div style={{ background: "#FEF9E7", padding: "10px 12px", borderRadius: 10 }}>Admins: {chartData.adminsPercent}%</div>
-            <div style={{ background: "#EAFAF1", padding: "10px 12px", borderRadius: 10 }}>Medecins: {chartData.medecinsPercent}%</div>
-            <div style={{ background: "#EBF5FB", padding: "10px 12px", borderRadius: 10 }}>Actifs 30j: {chartData.actifsPercent}%</div>
+            <div style={{ background: C.surface, padding: "10px 12px", borderRadius: 10, boxShadow: C.insetShadow }}>Admins: {chartData.adminsPercent}%</div>
+            <div style={{ background: C.surface, padding: "10px 12px", borderRadius: 10, boxShadow: C.insetShadow }}>Medecins: {chartData.medecinsPercent}%</div>
+            <div style={{ background: C.surface, padding: "10px 12px", borderRadius: 10, boxShadow: C.insetShadow }}>Actifs 30j: {chartData.actifsPercent}%</div>
           </div>
         </Card>
       )}

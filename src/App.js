@@ -35,7 +35,7 @@ function MedecinLayout() {
     { to: '/espace-medecin/patients', label: 'Patients', icon: '🧑‍⚕️' },
     { to: '/espace-medecin/dossier', label: 'Dossier patient', icon: '📁' },
     { to: '/espace-medecin/prescriptions', label: 'Prescriptions', icon: '🧾' },
-    { to: '/espace-medecin/communication', label: 'Communication', icon: '💬' },
+    { to: '/espace-medecin/communication', label: 'Messagerie', icon: '💬' },
     { to: '/espace-medecin/rapports', label: 'Rapports', icon: '📝' },
   ];
 
@@ -77,6 +77,7 @@ function App() {
           <Route path="/espacepatient/pathology" element={<EspacePatient section="pathology" />} />
           <Route path="/espacepatient/goals" element={<EspacePatient section="goals" />} />
           <Route path="/espacepatient/history" element={<EspacePatient section="history" />} />
+          <Route path="/espacepatient/messages" element={<EspacePatient section="messages" />} />
 
           <Route path="/espace-medecin" element={<MedecinLayout />}>
             <Route index element={<Navigate to="tableau-de-bord" replace />} />

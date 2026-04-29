@@ -2,9 +2,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const THEMES = {
-  primary: { base: "#2E86C1", dark: "#1A5276", light: "#D6EAF8" },
-  success: { base: "#27AE60", dark: "#1E8449", light: "#DFF5E6" },
-  info: { base: "#3B9DDB", dark: "#1A5276", light: "#D6EAF8" },
+  primary: { accent: "#1E6FE3", surface: "#E7E5E4", text: "#1E2938" },
+  success: { accent: "#00A63D", surface: "#E7E5E4", text: "#1E2938" },
+  info: { accent: "#1E6FE3", surface: "#E7E5E4", text: "#1E2938" },
+};
+
+const SHADOWS = {
+  card: "8px 8px 16px #c4c3c2, -8px -8px 16px #ffffff",
+  inset: "inset 4px 4px 8px #c4c3c2, inset -4px -4px 8px #ffffff",
 };
 
 export default function SideBar({ title, subtitle, items, accent = "primary" }) {
@@ -29,66 +34,44 @@ export default function SideBar({ title, subtitle, items, accent = "primary" }) 
   };
 
   return (
-    <aside style={{
-      width: 260,
-      background: `linear-gradient(180deg, ${theme.dark} 0%, ${theme.base} 65%, ${theme.base} 100%)`,
-      color: "#fff",
-      padding: "26px 18px",
-      display: "flex",
-      flexDirection: "column",
-      gap: 20,
-      position: "sticky",
-      top: 0,
-      height: "100vh",
-      boxShadow: "2px 0 18px rgba(0,0,0,0.08)",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 14, background: theme.light, display: "flex", alignItems: "center", justifyContent: "center", color: theme.dark, fontWeight: 700 }}>
-          🏥
+    <aside
+      className="neu-sidebar"
+      style={{
+        "--nav-accent": theme.accent,
+        "--nav-surface": theme.surface,
+        "--nav-text": theme.text,
+        "--nav-shadow": SHADOWS.card,
+        "--nav-inset": SHADOWS.inset,
+      }}
+    >
+      <div className="neu-sidebar__header">
+        <div className="neu-sidebar__badge">
+          +
         </div>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 16 }}>{title}</div>
-          <div style={{ fontSize: 11, opacity: 0.8 }}>{subtitle}</div>
+          <div className="neu-sidebar__title">{title}</div>
+          <div className="neu-sidebar__subtitle">{subtitle}</div>
         </div>
       </div>
 
-      <div style={{ background: "rgba(255,255,255,0.12)", borderRadius: 12, padding: "10px 12px", fontSize: 12 }}>
-        Acces securise
+      <div className="neu-sidebar__tag">
+        Club prive · Acces securise
       </div>
 
-      <nav style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, overflowY: "auto", paddingRight: 6 }}>
+      <nav className="neu-sidebar__nav" aria-label="Navigation principale">
         {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            style={({ isActive }) => ({
-              textDecoration: "none",
-              color: isActive ? theme.dark : "#EAF2F8",
-              background: isActive ? "#FFFFFF" : "transparent",
-              padding: "10px 12px",
-              borderRadius: 12,
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              fontWeight: isActive ? 700 : 500,
-              boxShadow: isActive ? "0 10px 24px rgba(0,0,0,0.12)" : "none",
-            })}
+            className={({ isActive }) => `neu-nav-link${isActive ? " is-active" : ""}`}
           >
-            <span style={{ fontSize: 16 }}>{item.icon || "•"}</span>
+            <span className="neu-nav-link__icon">{item.icon || "•"}</span>
             {item.label}
           </NavLink>
         ))}
       </nav>
 
-      <button onClick={handleLogout} style={{
-        background: "rgba(255,255,255,0.2)",
-        border: "1px solid rgba(255,255,255,0.35)",
-        color: "#fff",
-        padding: "10px 12px",
-        borderRadius: 12,
-        cursor: "pointer",
-        fontWeight: 600,
-      }}>
+      <button onClick={handleLogout} className="neu-logout">
         Se deconnecter
       </button>
     </aside>

@@ -1,25 +1,28 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 // ─── Color Tokens ───────────────────────────────────────────────────────────
 const C = {
-  bg: "#F0F7FF",
-  surface: "#FFFFFF",
-  surfaceAlt: "#F8FBFF",
-  primary: "#2E86C1",
-  primaryLight: "#AED6F1",
-  primaryDark: "#1A5276",
-  accent: "#27AE60",
-  accentLight: "#A9DFBF",
-  warning: "#E67E22",
-  danger: "#E74C3C",
-  dangerLight: "#FADBD8",
-  text: "#1B2631",
-  textMid: "#566573",
-  textLight: "#AEB6BF",
-  border: "#D6EAF8",
-  borderMid: "#A9CCE3",
-  cardShadow: "0 2px 12px rgba(46,134,193,0.08)",
+  bg: "#F1F2F5",
+  surface: "#E7E5E4",
+  surfaceAlt: "#F1F2F5",
+  primary: "#1E6FE3",
+  primaryLight: "#DCE9FF",
+  primaryDark: "#0B4DB8",
+  accent: "#00A63D",
+  accentLight: "#D7F5E2",
+  warning: "#FE9900",
+  danger: "#FF2157",
+  dangerLight: "#FFD6E0",
+  text: "#1E2938",
+  textMid: "#475569",
+  textLight: "#94A3B8",
+  border: "rgba(30,41,56,0.12)",
+  borderMid: "rgba(30,41,56,0.2)",
+  cardShadow: "8px 8px 16px rgba(30,41,56,0.12), -8px -8px 16px rgba(255,255,255,0.8)",
+  insetShadow: "inset 6px 6px 12px rgba(30,41,56,0.12), inset -6px -6px 12px rgba(255,255,255,0.7)",
 };
 
 const API_BASE = "http://localhost:5000/api";
@@ -35,6 +38,13 @@ const toDateLabel = (dateValue) => {
   const parsed = new Date(dateValue);
   if (Number.isNaN(parsed.valueOf())) return "";
   return parsed.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
+};
+
+const toDateTimeLabel = (dateValue) => {
+  if (!dateValue) return "";
+  const parsed = new Date(dateValue);
+  if (Number.isNaN(parsed.valueOf())) return "";
+  return parsed.toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 };
 
 function Badge({ color, children }) {
@@ -169,7 +179,7 @@ function FormField({ label, type = "number", value, onChange, unit, min, max, st
       <label style={{ fontSize: 13, fontWeight: 600, color: C.textMid, display: "block", marginBottom: 5 }}>{label}</label>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <input type={type} value={value} onChange={e => onChange(e.target.value)} min={min} max={max} step={step}
-          style={{ flex: 1, padding: "10px 12px", border: `1.5px solid ${C.borderMid}`, borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt, outline: "none" }} />
+          style={{ flex: 1, padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, outline: "none", boxShadow: C.insetShadow }} />
         {unit && <span style={{ fontSize: 13, color: C.textLight, whiteSpace: "nowrap" }}>{unit}</span>}
       </div>
     </div>
@@ -178,7 +188,7 @@ function FormField({ label, type = "number", value, onChange, unit, min, max, st
 
 function SubmitBtn({ onClick, children }) {
   return (
-    <button onClick={onClick} style={{ width: "100%", padding: "12px", background: C.primary, color: "#fff", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 6, letterSpacing: 0.3 }}>
+    <button onClick={onClick} style={{ width: "100%", padding: "12px", background: C.primary, color: "#fff", border: "none", borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: "pointer", marginTop: 6, letterSpacing: 0.3, boxShadow: C.cardShadow }}>
       {children}
     </button>
   );
@@ -623,7 +633,7 @@ function NutritionPage({ nutri, setNutri }) {
           <div style={{ marginBottom: 14 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: C.textMid, display: "block", marginBottom: 5 }}>Qualité nutritionnelle</label>
             <select value={form.qualite} onChange={e => setForm(f => ({ ...f, qualite: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${C.borderMid}`, borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, boxShadow: C.insetShadow }}>
               {["Excellente", "Bonne", "Moyenne", "Mauvaise"].map(q => <option key={q}>{q}</option>)}
             </select>
           </div>
@@ -828,7 +838,7 @@ function GoalsPage({ goals, setGoals }) {
               const presets = { "Pas quotidiens": { unite: "pas", icon: "🦶" }, "Eau": { unite: "L", icon: "💧" }, "Sommeil": { unite: "h", icon: "🌙" }, "Calories brûlées": { unite: "kcal", icon: "🔥" }, "Poids": { unite: "kg", icon: "⚖️" } };
               const p = presets[e.target.value] || {};
               setForm(f => ({ ...f, type: e.target.value, ...p }));
-            }} style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${C.borderMid}`, borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt }}>
+            }} style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, boxShadow: C.insetShadow }}>
               <option value="">Sélectionner...</option>
               {["Pas quotidiens", "Eau", "Sommeil", "Calories brûlées", "Poids"].map(t => <option key={t}>{t}</option>)}
             </select>
@@ -837,7 +847,7 @@ function GoalsPage({ goals, setGoals }) {
           <div style={{ marginBottom: 14 }}>
             <label style={{ fontSize: 13, fontWeight: 600, color: C.textMid, display: "block", marginBottom: 5 }}>Période</label>
             <select value={form.periode} onChange={e => setForm(f => ({ ...f, periode: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1.5px solid ${C.borderMid}`, borderRadius: 10, fontSize: 15, color: C.text, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, fontSize: 15, color: C.text, background: C.surface, boxShadow: C.insetShadow }}>
               <option>Quotidien</option><option>Hebdomadaire</option>
             </select>
           </div>
@@ -900,6 +910,64 @@ function HistoryPage({ vitals, bio, activity, patho, nutri }) {
   );
 }
 
+function MessagesPage({ messages, messageForm, setMessageForm, onSend, hasMedecin }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 16 }}>
+      <Card>
+        <SectionTitle sub="Envoyer un message a votre medecin">Messagerie</SectionTitle>
+        {!hasMedecin && (
+          <div style={{ background: "#FEF9E7", border: "1px solid #F9E79F", borderRadius: 10, padding: "10px 12px", marginBottom: 12, fontSize: 13, color: "#7D6608" }}>
+            Aucun medecin n'est attribue. La messagerie est inactive.
+          </div>
+        )}
+        <input
+          value={messageForm.subject}
+          onChange={(e) => setMessageForm((prev) => ({ ...prev, subject: e.target.value }))}
+          placeholder="Objet"
+          disabled={!hasMedecin}
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}
+        />
+        <textarea
+          value={messageForm.body}
+          onChange={(e) => setMessageForm((prev) => ({ ...prev, body: e.target.value }))}
+          placeholder="Ecrivez votre message..."
+          rows={6}
+          disabled={!hasMedecin}
+          style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }}
+        />
+        <button
+          onClick={onSend}
+          disabled={!hasMedecin}
+          style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}
+        >
+          Envoyer
+        </button>
+      </Card>
+
+      <Card>
+        <SectionTitle sub="Vos echanges recents">Historique des messages</SectionTitle>
+        {messages.map((message) => {
+          const isPatient = message.status === "patient";
+          return (
+            <div key={message.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "12px 0", borderBottom: `1px solid ${C.border}` }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 600 }}>{isPatient ? "Vous" : (message.medecin_label || "Medecin")}</div>
+                <div style={{ fontSize: 12, color: C.textLight, marginTop: 2 }}>{message.subject}</div>
+                <div style={{ fontSize: 12, color: C.textMid, marginTop: 6 }}>{message.body}</div>
+                <div style={{ fontSize: 11, color: C.textLight, marginTop: 6 }}>{toDateTimeLabel(message.created_at)}</div>
+              </div>
+              <Badge color={isPatient ? "success" : "info"}>{isPatient ? "Envoye" : "Recu"}</Badge>
+            </div>
+          );
+        })}
+        {messages.length === 0 && (
+          <div style={{ fontSize: 13, color: C.textLight }}>Aucun message pour le moment.</div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 // ─── Layout ───────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
   { key: "dashboard", label: "Tableau de bord", icon: "🏠" },
@@ -909,10 +977,12 @@ const NAV_ITEMS = [
   { key: "nutrition", label: "Nutrition", icon: "🍽️" },
   { key: "pathology", label: "Pathologie", icon: "🩸" },
   { key: "goals", label: "Objectifs", icon: "🎯" },
+  { key: "messages", label: "Messagerie", icon: "💬" },
   { key: "history", label: "Historique", icon: "📋" },
 ];
 
 export default function EspacePatient({ section = "dashboard" }) {
+  const navigate = useNavigate();
   const [page, setPage] = useState(section);
   const [vitals, setVitals] = useState([]);
   const [bio, setBio] = useState([]);
@@ -920,6 +990,9 @@ export default function EspacePatient({ section = "dashboard" }) {
   const [nutri, setNutri] = useState([]);
   const [patho, setPatho] = useState([]);
   const [goals, setGoals] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [messageForm, setMessageForm] = useState({ subject: "", body: "" });
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     if (section && section !== page) {
@@ -933,13 +1006,15 @@ export default function EspacePatient({ section = "dashboard" }) {
 
     const headers = { Authorization: `Bearer ${token}` };
     const load = async () => {
-      const [vitalsRes, bioRes, activityRes, nutriRes, pathoRes, goalsRes] = await Promise.all([
+      const [vitalsRes, bioRes, activityRes, nutriRes, pathoRes, goalsRes, messagesRes, profileRes] = await Promise.all([
         axios.get(`${API_BASE}/patient/vitals`, { headers }),
         axios.get(`${API_BASE}/patient/biometrics`, { headers }),
         axios.get(`${API_BASE}/patient/activity`, { headers }),
         axios.get(`${API_BASE}/patient/nutrition`, { headers }),
         axios.get(`${API_BASE}/patient/pathology`, { headers }),
         axios.get(`${API_BASE}/patient/goals`, { headers }),
+        axios.get(`${API_BASE}/patient/messages`, { headers }),
+        axios.get(`${API_BASE}/patient/profile`, { headers }),
       ]);
 
       setVitals(vitalsRes.data.map(r => ({ date: toDateLabel(r.measure_date), bpm: r.bpm, sys: r.sys, dia: r.dia, temp: Number(r.temp) })));
@@ -956,10 +1031,44 @@ export default function EspacePatient({ section = "dashboard" }) {
         periode: r.periode,
         icon: r.icon || "🎯",
       })));
+      setMessages(messagesRes.data || []);
+      setProfile(profileRes.data || null);
     };
 
     load();
   }, []);
+
+  const handleMessageSubmit = async () => {
+    if (!messageForm.subject || !messageForm.body) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const response = await axios.post(`${API_BASE}/patient/messages`, messageForm, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setMessages((current) => [response.data, ...current]);
+    setMessageForm({ subject: "", body: "" });
+  };
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Déconnexion",
+      text: "Voulez-vous vous déconnecter ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Oui",
+      cancelButtonText: "Annuler",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    });
+  };
+
+  const patientName = profile ? `${profile.prenom} ${profile.nom}` : "Patient";
+  const patientInitials = profile ? `${profile.prenom?.[0] || ""}${profile.nom?.[0] || ""}`.toUpperCase() : "??";
+  const medecinName = profile && profile.medecin_nom ? `${profile.medecin_prenom} ${profile.medecin_nom}` : "Non assigné";
+  const hasMedecin = Boolean(profile && profile.medecin_id);
 
   const renderPage = () => {
     switch (page) {
@@ -970,17 +1079,26 @@ export default function EspacePatient({ section = "dashboard" }) {
       case "nutrition": return <NutritionPage nutri={nutri} setNutri={setNutri} />;
       case "pathology": return <PathologyPage patho={patho} setPatho={setPatho} />;
       case "goals": return <GoalsPage goals={goals} setGoals={setGoals} />;
+      case "messages": return (
+        <MessagesPage
+          messages={messages}
+          messageForm={messageForm}
+          setMessageForm={setMessageForm}
+          onSend={handleMessageSubmit}
+          hasMedecin={hasMedecin}
+        />
+      );
       case "history": return <HistoryPage vitals={vitals} bio={bio} activity={activity} patho={patho} nutri={nutri} />;
       default: return null;
     }
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Space Grotesk', 'Segoe UI', sans-serif", background: C.bg, color: C.text }}>
-      <aside style={{ width: 240, background: C.surface, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", boxShadow: "2px 0 12px rgba(46,134,193,0.06)", flexShrink: 0 }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Space Mono', 'Segoe UI', monospace", background: C.bg, color: C.text }}>
+      <aside style={{ width: 240, background: C.surface, display: "flex", flexDirection: "column", boxShadow: C.cardShadow, flexShrink: 0 }}>
         <div style={{ padding: "24px 20px 20px", borderBottom: `1px solid ${C.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 10, background: C.primary, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 38, height: 38, borderRadius: 10, background: C.surface, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: C.insetShadow }}>
               <span style={{ fontSize: 20 }}>🏥</span>
             </div>
             <div>
@@ -993,11 +1111,11 @@ export default function EspacePatient({ section = "dashboard" }) {
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}`, background: C.surfaceAlt }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.primaryLight, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, color: C.primaryDark }}>
-              AM
+              {patientInitials}
             </div>
             <div>
-              <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>Aymen Mabrouk</div>
-              <div style={{ fontSize: 11, color: C.textLight }}>Patient #P-2024-001</div>
+              <div style={{ fontWeight: 600, fontSize: 13, color: C.text }}>{patientName}</div>
+              <div style={{ fontSize: 11, color: C.textLight }}>{hasMedecin ? `Medecin: ${medecinName}` : "Medecin non assigne"}</div>
             </div>
           </div>
         </div>
@@ -1007,7 +1125,7 @@ export default function EspacePatient({ section = "dashboard" }) {
             const active = page === item.key;
             return (
               <button key={item.key} onClick={() => setPage(item.key)}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", marginBottom: 3, borderRadius: 10, border: "none", background: active ? `${C.primary}15` : "transparent", color: active ? C.primary : C.textMid, cursor: "pointer", textAlign: "left", fontWeight: active ? 700 : 400, fontSize: 14, transition: "all 0.15s" }}>
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", marginBottom: 3, borderRadius: 10, border: "none", background: active ? C.surface : "transparent", color: active ? C.primary : C.textMid, cursor: "pointer", textAlign: "left", fontWeight: active ? 700 : 500, fontSize: 14, transition: "all 0.15s", boxShadow: active ? C.insetShadow : "none" }}>
                 <span style={{ fontSize: 17 }}>{item.icon}</span>
                 {item.label}
               </button>
@@ -1016,30 +1134,36 @@ export default function EspacePatient({ section = "dashboard" }) {
         </nav>
 
         <div style={{ padding: "16px 20px", borderTop: `1px solid ${C.border}` }}>
-          <div style={{ fontSize: 11, color: C.textLight, marginBottom: 8 }}>Sprint 2 · Frontend React</div>
-          <div style={{ display: "flex", gap: 4 }}>
-            {["W", "F", "A", "C"].map((m, i) => (
-              <div key={i} style={{ width: 26, height: 26, borderRadius: "50%", background: [C.primary, C.accent, C.warning, "#9B59B6"][i], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>{m}</div>
-            ))}
+          <div style={{ fontSize: 11, color: C.textLight, marginBottom: 10 }}>Profil patient</div>
+          <div style={{ fontSize: 12, color: C.textMid, marginBottom: 12 }}>
+            {hasMedecin ? `Suivi par ${medecinName}` : "Aucun medecin attribue"}
           </div>
+          <button onClick={handleLogout} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, color: C.text, fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
+            Deconnexion
+          </button>
         </div>
       </aside>
 
       <main style={{ flex: 1, overflowY: "auto" }}>
-        <header style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+        <header style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, boxShadow: C.cardShadow }}>
           <div>
             <div style={{ fontSize: 13, color: C.textLight }}>Bienvenue,</div>
-            <div style={{ fontWeight: 700, fontSize: 17, color: C.text }}>Aymen Mabrouk</div>
+            <div style={{ fontWeight: 700, fontSize: 17, color: C.text }}>{patientName}</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ fontSize: 13, color: C.textMid }}>
               {new Date().toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
             </div>
-            <div style={{ width: 10, height: 10, borderRadius: "50%", background: C.accent, boxShadow: `0 0 0 3px ${C.accentLight}` }} title="Connecté" />
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: C.primary, boxShadow: `0 0 0 3px ${C.primaryLight}` }} title="Connecté" />
           </div>
         </header>
 
         <div style={{ padding: "28px 32px", maxWidth: 1100, margin: "0 auto" }}>
+          {!hasMedecin && (
+            <div style={{ background: "#FEF9E7", border: "1px solid #F9E79F", borderRadius: 12, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#7D6608" }}>
+              Votre compte n'est pas encore attribue a un medecin. Merci de contacter l'administration.
+            </div>
+          )}
           {renderPage()}
         </div>
       </main>

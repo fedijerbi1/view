@@ -2,23 +2,24 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
 const C = {
-  bg: "#F0F7FF",
-  surface: "#FFFFFF",
-  surfaceAlt: "#F8FBFF",
-  primary: "#2E86C1",
-  primaryLight: "#AED6F1",
-  primaryDark: "#1A5276",
-  accent: "#27AE60",
-  accentLight: "#A9DFBF",
-  warning: "#E67E22",
-  danger: "#E74C3C",
-  dangerLight: "#FADBD8",
-  text: "#1B2631",
-  textMid: "#566573",
-  textLight: "#AEB6BF",
-  border: "#D6EAF8",
-  borderMid: "#A9CCE3",
-  cardShadow: "0 2px 12px rgba(46,134,193,0.08)",
+  bg: "#F1F2F5",
+  surface: "#E7E5E4",
+  surfaceAlt: "#F1F2F5",
+  primary: "#1E6FE3",
+  primaryLight: "#DCE9FF",
+  primaryDark: "#0B4DB8",
+  accent: "#00A63D",
+  accentLight: "#D7F5E2",
+  warning: "#FE9900",
+  danger: "#FF2157",
+  dangerLight: "#FFD6E0",
+  text: "#1E2938",
+  textMid: "#475569",
+  textLight: "#94A3B8",
+  border: "rgba(30,41,56,0.12)",
+  borderMid: "rgba(30,41,56,0.2)",
+  cardShadow: "8px 8px 16px rgba(30,41,56,0.12), -8px -8px 16px rgba(255,255,255,0.8)",
+  insetShadow: "inset 6px 6px 12px rgba(30,41,56,0.12), inset -6px -6px 12px rgba(255,255,255,0.7)",
 };
 
 const API_BASE = "http://localhost:5000/api";
@@ -301,8 +302,8 @@ export default function EspaceMedecin({ section = "dashboard" }) {
                   <td style={{ padding: "10px 12px" }}>{formatDate(patient.last_visit) || "--"}</td>
                   <td style={{ padding: "10px 12px" }}>{patient.status}</td>
                   <td style={{ padding: "10px 12px" }}>
-                    <button onClick={() => handleSelectPatient(patient.id)} style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${C.borderMid}`, background: "transparent", cursor: "pointer", marginRight: 6 }}>Ouvrir</button>
-                    <button style={{ padding: "6px 10px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", cursor: "pointer" }}>Planifier</button>
+                    <button onClick={() => handleSelectPatient(patient.id)} style={{ padding: "6px 10px", borderRadius: 8, border: "none", background: C.surface, cursor: "pointer", marginRight: 6, boxShadow: C.cardShadow, color: C.text }}>Ouvrir</button>
+                    <button style={{ padding: "6px 10px", borderRadius: 8, border: "none", background: C.primary, color: "#fff", cursor: "pointer", boxShadow: C.cardShadow }}>Planifier</button>
                   </td>
                 </tr>
               ))}
@@ -387,22 +388,22 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             <SectionTitle sub="Nouvelle prescription">Creer une ordonnance</SectionTitle>
             <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
             <select value={prescriptionForm.patientId} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, patientId: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
               {patientOptions.map((p) => (
                 <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
               ))}
             </select>
             <input value={prescriptionForm.medicine} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, medicine: e.target.value }))}
-              placeholder="Medicament" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}`, marginBottom: 12 }} />
+              placeholder="Medicament" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <input value={prescriptionForm.dosage} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, dosage: e.target.value }))}
-                placeholder="Dosage" style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+                placeholder="Dosage" style={{ padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
               <input value={prescriptionForm.duration} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, duration: e.target.value }))}
-                placeholder="Duree" style={{ padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
+                placeholder="Duree" style={{ padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
             </div>
             <textarea value={prescriptionForm.notes} onChange={(e) => setPrescriptionForm((prev) => ({ ...prev, notes: e.target.value }))}
-              placeholder="Notes cliniques" rows={3} style={{ width: "100%", marginTop: 12, padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
-            <button onClick={handlePrescriptionSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+              placeholder="Notes cliniques" rows={3} style={{ width: "100%", marginTop: 12, padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
+            <button onClick={handlePrescriptionSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
               Valider la prescription
             </button>
           </Card>
@@ -438,16 +439,16 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             <SectionTitle sub="Nouveau message">Messagerie patient</SectionTitle>
             <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
             <select value={messageForm.patientId} onChange={(e) => setMessageForm((prev) => ({ ...prev, patientId: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
               {patientOptions.map((p) => (
                 <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
               ))}
             </select>
             <input value={messageForm.subject} onChange={(e) => setMessageForm((prev) => ({ ...prev, subject: e.target.value }))}
-              placeholder="Objet" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}`, marginBottom: 12 }} />
+              placeholder="Objet" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }} />
             <textarea value={messageForm.body} onChange={(e) => setMessageForm((prev) => ({ ...prev, body: e.target.value }))}
-              placeholder="Contenu du message" rows={6} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
-            <button onClick={handleMessageSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+              placeholder="Contenu du message" rows={6} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
+            <button onClick={handleMessageSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
               Envoyer
             </button>
           </Card>
@@ -476,7 +477,7 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             <SectionTitle sub="Generer un rapport">Synthese medicale</SectionTitle>
             <label style={{ fontSize: 12, color: C.textLight }}>Patient</label>
             <select value={reportForm.patientId} onChange={(e) => setReportForm((prev) => ({ ...prev, patientId: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
               <option value="">Tous les patients</option>
               {patientOptions.map((p) => (
                 <option key={p.id} value={p.id}>{p.prenom} {p.nom}</option>
@@ -484,21 +485,21 @@ export default function EspaceMedecin({ section = "dashboard" }) {
             </select>
             <label style={{ fontSize: 12, color: C.textLight }}>Periode</label>
             <select value={reportForm.period} onChange={(e) => setReportForm((prev) => ({ ...prev, period: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
               {"Hebdomadaire Mensuel Trimestriel".split(" ").map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
             <label style={{ fontSize: 12, color: C.textLight }}>Focus</label>
             <select value={reportForm.focus} onChange={(e) => setReportForm((prev) => ({ ...prev, focus: e.target.value }))}
-              style={{ width: "100%", padding: "10px 12px", border: `1px solid ${C.borderMid}`, borderRadius: 10, marginBottom: 12, background: C.surfaceAlt }}>
+              style={{ width: "100%", padding: "10px 12px", border: "none", borderRadius: 10, marginBottom: 12, background: C.surface, boxShadow: C.insetShadow }}>
               {"Cardio Diabete Respiratoire".split(" ").map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
             <textarea value={reportForm.summary} onChange={(e) => setReportForm((prev) => ({ ...prev, summary: e.target.value }))}
-              placeholder="Notes de synthese" rows={4} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: `1px solid ${C.borderMid}` }} />
-            <button onClick={handleReportSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer" }}>
+              placeholder="Notes de synthese" rows={4} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "none", background: C.surface, boxShadow: C.insetShadow }} />
+            <button onClick={handleReportSubmit} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 12, border: "none", background: C.primary, color: "#fff", fontWeight: 700, cursor: "pointer", boxShadow: C.cardShadow }}>
               Generer le rapport
             </button>
           </Card>
